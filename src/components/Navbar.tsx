@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ethers } from "ethers";
 import {
   Dialog,
   DialogPanel,
@@ -65,8 +66,37 @@ const callsToAction = [
   { name: "Contact sales", href: "#", icon: PhoneIcon },
 ];
 
+declare global {
+  interface Window {
+    ethereum?: {
+      request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
+      on: (event: string, callback: (...args: unknown[]) => void) => void;
+      removeListener: (event: string, callback: (...args: unknown[]) => void) => void;
+    }
+  }
+}
+
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [walletAddress, setWalletAddress] = useState("");
+
+  const connectWallet = async () => {
+    if (typeof window.ethereum !== 'undefined') {
+      try {
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const accounts = await provider.send("eth_requestAccounts", []);
+        if (Array.isArray(accounts) && typeof accounts[0] === 'string') {
+          setWalletAddress(accounts[0]);
+        } else {
+          throw new Error("Unexpected response format");
+        }
+      } catch (error) {
+        console.error("Failed to connect wallet:", error);
+      }
+    } else {
+      console.error("Metamask is not installed");
+    }
+  };
 
   return (
     <header className="bg-white border-b">
@@ -158,9 +188,18 @@ export default function Navbar() {
           </a>
         </PopoverGroup>
         <div className="hidden lg:flex lg:flex-1 lg:justify-end">
-          <a href="#" className="text-sm font-semibold leading-6 text-gray-900 border-b-2 border-b-[#7DD956]">
-            Connect Wallet
-          </a>
+          {walletAddress ? (
+            <span className="text-sm font-semibold leading-6 text-gray-900 border-b-2 border-b-[#7DD956]">
+              {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
+            </span>
+          ) : (
+            <button
+              onClick={connectWallet}
+              className="text-sm font-semibold leading-6 text-gray-900 border-b-2 border-b-[#7DD956]"
+            >
+              Connect Wallet
+            </button>
+          )}
         </div>
       </nav>
       <Dialog
@@ -228,12 +267,12 @@ export default function Navbar() {
                 </a>
               </div>
               <div className="py-6">
-                <a
-                  href="#"
+                <button
+                  onClick={connectWallet}
                   className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
                 >
                   Connect Wallet
-                </a>
+                </button>
               </div>
             </div>
           </div>
