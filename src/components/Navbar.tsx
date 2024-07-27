@@ -1,6 +1,7 @@
-"use client";
+// src/components/Navbar.tsx
 
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import {
   Dialog,
   DialogPanel,
@@ -75,10 +76,10 @@ export default function Navbar() {
         className="mx-auto flex max-w-7xl items-center justify-between p-4 lg:px-8"
       >
         <div className="flex lg:flex-1">
-          <a href="#" className="-m-1.5 p-1.5">
+          <Link to="/" className="-m-1.5 p-1.5">
             <span className="sr-only">Your Company</span>
             <img alt="" src={Logo} className="h-6 w-auto" />
-          </a>
+          </Link>
         </div>
         <div className="flex lg:hidden">
           <button
@@ -124,7 +125,9 @@ export default function Navbar() {
                         {item.name}
                         <span className="absolute inset-0" />
                       </a>
-                      <p className="mt-1 text-gray-600">{item.description}</p>
+                      <p className="mt-1 text-gray-600">
+                        {item.description}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -146,20 +149,44 @@ export default function Navbar() {
               </div>
             </PopoverPanel>
           </Popover>
+          <Link
+            to="/disputes"
+            className="text-sm font-semibold leading-6 text-gray-900"
+          >
+            Disputes
+          </Link>
 
-          <a href="#" className="text-sm font-semibold leading-6 text-gray-900">
+          <Link
+            to="/verification"
+            className="text-sm font-semibold leading-6 text-gray-900"
+          >
+            Verification
+          </Link>
+          <a
+            href="#"
+            className="text-sm font-semibold leading-6 text-gray-900"
+          >
             Features
           </a>
-          <a href="#" className="text-sm font-semibold leading-6 text-gray-900">
+          <a
+            href="#"
+            className="text-sm font-semibold leading-6 text-gray-900"
+          >
             Marketplace
           </a>
-          <a href="#" className="text-sm font-semibold leading-6 text-gray-900">
+          <a
+            href="#"
+            className="text-sm font-semibold leading-6 text-gray-900"
+          >
             Company
           </a>
         </PopoverGroup>
         <div className="hidden lg:flex lg:flex-1 lg:justify-end">
-          <a href="#" className="text-sm font-semibold leading-6 text-gray-900 border-b-2 border-b-[#7DD956]">
-            Connect Wallet
+          <a
+            href="#"
+            className="text-sm font-semibold leading-6 text-gray-900 border-b-2 border-b-[#7DD956]"
+          >
+            Connect 
           </a>
         </div>
       </nav>
@@ -171,10 +198,10 @@ export default function Navbar() {
         <div className="fixed inset-0 z-10" />
         <DialogPanel className="fixed inset-y-0 right-0 z-10 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
           <div className="flex items-center justify-between">
-            <a href="#" className="-m-1.5 p-1.5">
+            <Link to="#" className="-m-1.5 p-1.5">
               <span className="sr-only">Your Company</span>
               <img alt="" src={Logo} className="h-8 w-auto" />
-            </a>
+            </Link>
             <button
               type="button"
               onClick={() => setMobileMenuOpen(false)}
