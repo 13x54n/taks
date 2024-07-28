@@ -1,23 +1,10 @@
-// src/pages/Verification.tsx
-
 import React, { useState, useRef, useEffect } from 'react';
 
 const questions = [
-  "What is your name?",
-  "Where are you from?",
-  "What is your favorite hobby?",
-  "What is your profession?",
-  "What is your favorite color?",
-  "Do you have any pets?",
-  "What is your favorite food?",
-  "What is your favorite movie?",
-  "What is your favorite book?",
-  "What is your favorite travel destination?",
-  "Wave your hand",
-  "Show your left hand",
-  "Smile at the camera",
-  "Touch your nose",
-  "Clap your hands"
+  "Wave your hand.",
+  "Show your left hand.",
+  "Touch your nose.",
+  "Blink three times."
 ];
 
 function shuffleArray(array: string[]) {
@@ -62,7 +49,7 @@ export default function Verification() {
   const handleStartRecording = () => {
     setIsPreview(false);
     setRecordedChunks([]);
-    setShuffledQuestions(shuffleArray(questions).slice(0, 10));
+    setShuffledQuestions(shuffleArray(questions));
     setIsRecording(true);
   };
 
@@ -92,9 +79,9 @@ export default function Verification() {
       <h1 className="text-2xl font-bold text-center mb-8 text-primary">Video Verification</h1>
       <div className="flex gap-8">
         <div className="flex-1">
-          <video ref={videoRef} autoPlay muted={!isPreview} className={`w-full h-auto border rounded-md mb-4 ${isRecording ? 'border-red-500' : 'border-gray-300'}`} />
+          <video ref={videoRef} autoPlay muted={!isPreview} className={`w-full h-64 border rounded-md mb-4 ${isRecording ? 'border-red-500' : 'border-gray-300'}`} />
           {isPreview && recordedChunks.length > 0 && (
-            <video ref={previewRef} controls className="w-full h-auto border rounded-md mb-4">
+            <video ref={previewRef} controls className="w-full h-64 border rounded-md mb-4">
               <source src={URL.createObjectURL(new Blob(recordedChunks, { type: 'video/webm' }))} type="video/webm" />
             </video>
           )}
@@ -132,7 +119,7 @@ export default function Verification() {
           )}
         </div>
         <div className="flex-1">
-          <h2 className="text-xl font-semibold mb-4">General Questions</h2>
+          <h2 className="text-xl font-semibold mb-4">Verification Questions</h2>
           <ul className="list-decimal pl-5 space-y-2">
             {shuffledQuestions.map((question, index) => (
               <li key={index} className="text-lg">{question}</li>
