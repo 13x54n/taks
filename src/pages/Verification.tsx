@@ -1,16 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 
-const questions = [
-  "Wave your hand.",
-  "Show your left hand.",
-  "Touch your nose.",
-  "Blink three times."
-];
-
-function shuffleArray(array: string[]) {
-  return array.sort(() => Math.random() - 0.5);
-}
-
 export default function Verification() {
   const [isRecording, setIsRecording] = useState(false);
   const [isPreview, setIsPreview] = useState(false);
@@ -49,7 +38,12 @@ export default function Verification() {
   const handleStartRecording = () => {
     setIsPreview(false);
     setRecordedChunks([]);
-    setShuffledQuestions(shuffleArray(questions));
+    fetch('http://localhost:3001/api/questions')
+      .then(response => response.json())
+      .then(data => {
+        setShuffledQuestions(data);
+      })
+      .catch(error => console.error('Error fetching questions:', error));
     setIsRecording(true);
   };
 
@@ -59,6 +53,29 @@ export default function Verification() {
   };
 
   const handleSaveRecording = () => {
+    if (recordedChunks.length) {
+      const blob = new Blob(recordedChunks, {
+        type: 'video/webm'
+      });
+      const formData = new FormData();
+      formData.append('video', blob, 'verification_video.webm');
+      formData.append('questions', JSON.stringify(shuffledQuestions));
+
+      fetch('http://localhost:3001/api/upload', {
+        method: 'POST',
+        body: formData
+      })
+        .then(response => response.text())
+        .then(data => {
+          console.log(data);
+        })
+        .catch(error => {
+          console.error('Error uploading video:', error);
+        });
+    }
+  };
+
+  const handleDownloadRecording = () => {
     if (recordedChunks.length) {
       const blob = new Blob(recordedChunks, {
         type: 'video/webm'
@@ -102,20 +119,27 @@ export default function Verification() {
             </button>
           )}
           {isPreview && (
-            <>
+            <div className='flex'>
               <button
                 onClick={handleStartRecording}
-                className="px-6 py-2 font-semibold text-white bg-blue-500 border border-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                className="px-6 py-2 font-semibold text-white bg-blue-500 border border-blue-500 rounded-md hover:bg-blue-600 active:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300"
               >
                 Start New Recording
               </button>
               <button
                 onClick={handleSaveRecording}
-                className="px-6 py-2 font-semibold text-white bg-green-500 border border-green-500 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-300 ml-4"
+                className="px-6 py-2 font-semibold text-white bg-green-500 border border-green-500 rounded-md hover:bg-green-600 active:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-300 ml-4"
               >
                 Save Recording
               </button>
-            </>
+              <button
+                onClick={handleDownloadRecording}
+                className="px-6 py-2 font-semibold text-white bg-yellow-500 border border-yellow-500 rounded-md hover:bg-yellow-600 active:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-300 ml-4"
+              >
+                Download Recording
+              </button>
+            </div>
+
           )}
         </div>
         <div className="flex-1">
