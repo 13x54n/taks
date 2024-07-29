@@ -1,7 +1,6 @@
 // src/components/Navbar.tsx
 
 import { useState } from "react";
-import { ethers } from "ethers";
 import {
   Dialog,
   DialogPanel,
@@ -28,6 +27,7 @@ import {
   PlayCircleIcon,
 } from "@heroicons/react/20/solid";
 import Logo from "../../public/logo.png";
+import { Link } from "react-router-dom";
 
 const products = [
   {
