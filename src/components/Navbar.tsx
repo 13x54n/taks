@@ -1,16 +1,10 @@
-"use client";
-
 import { useState, useEffect } from "react";
-import { ethers } from "ethers";
+import { BrowserProvider } from "ethers";
 import {
   Dialog,
   Disclosure,
-  // DisclosureButton,
-  // DisclosurePanel,
   Popover,
-  // PopoverButton,
   PopoverGroup,
-  // PopoverPanel,
 } from "@headlessui/react";
 import {
   ArrowPathIcon,
@@ -76,55 +70,79 @@ declare global {
     grecaptcha: {
       ready: (callback: () => void) => void;
       execute: (siteKey: string, options: { action: string }) => Promise<string>;
+      getResponse: () => string | null;
+      reset: () => void;
     };
   }
 }
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [walletAddress, setWalletAddress] = useState("");
-  const [recaptchaToken, setRecaptchaToken] = useState("");
+  const [walletAddress, setWalletAddress] = useState<string>("");
 
   useEffect(() => {
-    const loadRecaptchaScript = () => {
-      const script = document.createElement("script");
-      script.src = `https://www.google.com/recaptcha/api.js?render=6Ldd_xoqAAAAADr3aQJ7Ol5npoXycBpGejEcIi4j`;
-      script.async = true;
-      script.defer = true;
-      document.body.appendChild(script);
-    };
-
     loadRecaptchaScript();
   }, []);
 
-  const executeRecaptcha = () => {
-    window.grecaptcha.ready(() => {
-      window.grecaptcha.execute('6Ldd_xoqAAAAADr3aQJ7Ol5npoXycBpGejEcIi4j', { action: 'submit' }).then((token: string) => {
-        setRecaptchaToken(token);
-      });
+  const loadRecaptchaScript = () => {
+    const script = document.createElement("script");
+    script.src = `https://www.google.com/recaptcha/api.js?render=6Ldd_xoqAAAAADr3aQJ7Ol5npoXycBpGejEcIi4j`;
+    script.async = true;
+    script.defer = true;
+    script.onload = () => {
+      console.log("reCAPTCHA script loaded successfully");
+    };
+    script.onerror = () => {
+      console.error("Failed to load reCAPTCHA script");
+    };
+    document.body.appendChild(script);
+  };
+
+  const executeRecaptcha = (): Promise<string> => {
+    return new Promise<string>((resolve, reject) => {
+      if (typeof window.grecaptcha !== 'undefined') {
+        window.grecaptcha.ready(() => {
+          window.grecaptcha.execute('6Ldd_xoqAAAAADr3aQJ7Ol5npoXycBpGejEcIi4j', { action: 'submit' })
+            .then((token: string) => {
+              console.log("reCAPTCHA token received:", token);
+              resolve(token);
+            })
+            .catch((error: Error) => {
+              console.error("reCAPTCHA error:", error);
+              reject(error);
+            });
+        });
+      } else {
+        reject(new Error('reCAPTCHA not loaded'));
+      }
     });
   };
 
-  const connectWallet = async () => {
-    if (!recaptchaToken) {
-      alert("Please complete the CAPTCHA");
-      return;
-    }
+  const connectWallet = async (): Promise<void> => {
+    try {
+      const recaptchaToken = await executeRecaptcha();
+      if (!recaptchaToken) {
+        alert("Please complete the CAPTCHA");
+        return;
+      }
 
-    if (typeof window.ethereum !== 'undefined') {
-      try {
-        const provider = new ethers.BrowserProvider(window.ethereum);
+      if (window.ethereum) {
+        const provider = new BrowserProvider(window.ethereum);
         const accounts = await provider.send("eth_requestAccounts", []);
         if (Array.isArray(accounts) && typeof accounts[0] === 'string') {
           setWalletAddress(accounts[0]);
         } else {
           throw new Error("Unexpected response format");
         }
-      } catch (error) {
+      } else {
+        console.error("MetaMask is not installed");
+      }
+    } catch (error) {
+      if (error instanceof Error && error.message === "User rejected the request.") {
+        alert("You need to accept the request to connect your wallet.");
+      } else {
         console.error("Failed to connect wallet:", error);
       }
-    } else {
-      console.error("Metamask is not installed");
     }
   };
 
@@ -138,7 +156,7 @@ export default function Navbar() {
           <div className="flex lg:flex-1">
             <a href="#" className="-m-1.5 p-1.5">
               <span className="sr-only">Your Company</span>
-              <img alt="" src={Logo} className="h-6 w-auto" />
+              <img alt="Logo" src={Logo} className="h-6 w-auto" />
             </a>
           </div>
           <div className="flex lg:hidden">
@@ -226,12 +244,6 @@ export default function Navbar() {
             ) : (
               <>
                 <button
-                  onClick={executeRecaptcha}
-                  className="text-sm font-semibold leading-6 text-gray-900 border-b-2 border-b-[#7DD956]"
-                >
-                  Verify CAPTCHA
-                </button>
-                <button
                   onClick={connectWallet}
                   className="text-sm font-semibold leading-6 text-gray-900 border-b-2 border-b-[#7DD956]"
                 >
@@ -252,7 +264,7 @@ export default function Navbar() {
           <div className="flex items-center justify-between">
             <a href="#" className="-m-1.5 p-1.5">
               <span className="sr-only">Your Company</span>
-              <img alt="" src={Logo} className="h-8 w-auto" />
+              <img alt="Logo" src={Logo} className="h-8 w-auto" />
             </a>
             <button
               type="button"
@@ -308,14 +320,8 @@ export default function Navbar() {
               </div>
               <div className="py-6">
                 <button
-                  onClick={executeRecaptcha}
-                  className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
-                >
-                  Verify CAPTCHA
-                </button>
-                <button
                   onClick={connectWallet}
-                  className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                  className="text-sm font-semibold leading-6 text-gray-900 border-b-2 border-b-[#7DD956]"
                 >
                   Connect Wallet
                 </button>
