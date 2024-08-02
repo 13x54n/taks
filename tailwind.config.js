@@ -1,39 +1,39 @@
 /** @type {import('tailwindcss').Config} */
-export const darkMode = ['class'];
+export const darkMode = ["class"];
 export const content = [
-  './pages/**/*.{ts,tsx}',
-  './components/**/*.{ts,tsx}',
-  './app/**/*.{ts,tsx}',
-  './src/**/*.{ts,tsx}',
+  "./pages/**/*.{ts,tsx}",
+  "./components/**/*.{ts,tsx}",
+  "./app/**/*.{ts,tsx}",
+  "./src/**/*.{ts,tsx}",
 ];
-export const prefix = '';
+export const prefix = "";
 export const theme = {
   colors: {
-    primary: '#7DD956',
+    primary: "#7DD956",
   },
   container: {
     center: true,
-    padding: '2rem',
+    padding: "2rem",
     screens: {
-      '2xl': '1400px',
+      "2xl": "1400px",
     },
   },
   extend: {
     keyframes: {
-      'accordion-down': {
-        from: { height: '0' },
-        to: { height: 'var(--radix-accordion-content-height)' },
+      "accordion-down": {
+        from: { height: "0" },
+        to: { height: "var(--radix-accordion-content-height)" },
       },
-      'accordion-up': {
-        from: { height: 'var(--radix-accordion-content-height)' },
-        to: { height: '0' },
+      "accordion-up": {
+        from: { height: "var(--radix-accordion-content-height)" },
+        to: { height: "0" },
       },
     },
     animation: {
-      'accordion-down': 'accordion-down 0.2s ease-out',
-      'accordion-up': 'accordion-up 0.2s ease-out',
+      "accordion-down": "accordion-down 0.2s ease-out",
+      "accordion-up": "accordion-up 0.2s ease-out",
     },
   },
 };
 // eslint-disable-next-line no-undef
-export const plugins = [require('tailwindcss-animate')];
+export const plugins = [require("tailwindcss-animate")];

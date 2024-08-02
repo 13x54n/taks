@@ -4,34 +4,28 @@ import Home from "../pages/Home";
 import Index from "@/pages/Index";
 import Verification from "@/pages/Verification";
 import Dashboard from "@/pages/Dashboard";
+import Profile from "@/pages/Profile"; 
+import Dispute from "@/pages/Dispute"; 
+import Awards from "@/pages/Awards"; 
 
 export const router = createBrowserRouter([
   {
     path: '/',
     element: (
       <>
-        <Navbar/>
-        <Index/>
-      </>
-    )
-  },
-  {
-    path: "/disputes",
-    element: (
-      <>
         <Navbar />
-        <Home/>
+        <Index />
       </>
     ),
   },
   {
-    path: "/verification",
+    path: '/home',
     element: (
       <>
-      <Navbar/>
-      <Verification/>
+        <Navbar />
+        <Home />
       </>
-    )
+    ),
   },
   {
     path: "/dashboard",
@@ -41,6 +35,51 @@ export const router = createBrowserRouter([
       <Dashboard/>
       </>
     )
+  },
+  {
+    path: "/profile",
+    element: (
+      <>
+        <Navbar />
+        <Profile />
+      </>
+    ),
+  },
+  {
+    path: "/disputes",
+    element: (
+      <>
+        <Navbar />
+        <Dispute />
+      </>
+    ),
+  },
+  {
+    path: "/awards",
+    element: (
+      <>
+        <Navbar />
+        <Awards />
+      </>
+    ),
+  },
+  {
+    path: "/verification",
+    element: (
+      <>
+        <Navbar />
+        <Verification />
+      </>
+    ),
+  },
+  {
+    path: "/dashboard",
+    element: (
+      <>
+        <Navbar />
+        <Dashboard />
+      </>
+    ),
   },
   {
     path: "/test",
