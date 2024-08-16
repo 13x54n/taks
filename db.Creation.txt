@@ -1,0 +1,26 @@
+CREATE TABLE roles (
+  id SERIAL PRIMARY KEY,
+  wallet_address VARCHAR(255) NOT NULL,
+  role VARCHAR(50) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE jobs (
+  id SERIAL PRIMARY KEY,
+  title VARCHAR(255) NOT NULL,
+  description TEXT NOT NULL,
+  location VARCHAR(255) NOT NULL,
+  salary VARCHAR(50),
+  employer VARCHAR(255) NOT NULL,
+  transaction_hash VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS job_applications (
+  id SERIAL PRIMARY KEY,
+  job_id INTEGER NOT NULL,
+  employee_wallet_address VARCHAR(255) NOT NULL,
+  cover_letter TEXT NOT NULL,
+  resume_link VARCHAR(255),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
