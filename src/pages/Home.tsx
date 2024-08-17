@@ -78,7 +78,7 @@ export default function Home() {
             <TabsContent value="saved_tasks">Saved tasks.</TabsContent>
           </Tabs>
         </div>
-        <div className="max-w-[12vw] focus:ring-0 focus:border-none">
+        <div className="max-w-[20vw] focus:ring-0 focus:border-none">
           <div className="text-sm p-4">
             <div className="flex items-center space-x-4 mb-4">
               <Skeleton className="h-12 w-12 rounded-full" />

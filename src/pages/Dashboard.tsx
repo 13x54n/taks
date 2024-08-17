@@ -52,7 +52,7 @@ const Dashboard = () => {
   }, [walletAddress, role]);
 
   return (
-    <div className="max-w-6xl mx-auto p-8 space-y-8">
+    <div className="max-w-6xl mx-auto space-y-8">
       <h1 className="text-4xl font-bold mb-8 text-gray-800">Dashboard</h1>
 
       {role === 'Employer' && (
