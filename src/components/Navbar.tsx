@@ -1,10 +1,35 @@
 import { useState, useEffect } from "react";
+<<<<<<< HEAD
 import { BrowserProvider, formatEther } from "ethers";
 import { useNavigate, NavLink } from "react-router-dom";
 import { Bars3Icon, XMarkIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 import RoleSelectionModal from "./ui/RoleSelectionModel";
+=======
+import { BrowserProvider } from "ethers";
+import { NavLink } from "react-router-dom";
+import {
+  Bars3Icon,
+  XMarkIcon,
+  UserCircleIcon,
+} from "@heroicons/react/24/outline";
+>>>>>>> c78f2fa4c3381d1626ac846a5fec9160fdb3de99
 import Logo from "../../public/logo.png";
-import { useWallet } from "../context/WalletContext";
+
+declare global {
+  interface Window {
+    ethereum?: {
+      request: (args: {
+        method: string;
+        params?: unknown[];
+      }) => Promise<unknown>;
+      on: (event: string, callback: (...args: unknown[]) => void) => void;
+      removeListener: (
+        event: string,
+        callback: (...args: unknown[]) => void
+      ) => void;
+    };
+  }
+}
 
 // Add global declaration for TypeScript
 declare global {
@@ -15,10 +40,8 @@ declare global {
 }
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [walletAddress, setWalletAddress] = useState<string>("");
   const [balance, setBalance] = useState<string>("");
-  const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
-  const { walletAddress, setWalletAddress, setRole } = useWallet();
-  const navigate = useNavigate();
 
   useEffect(() => {
     const savedWalletAddress = localStorage.getItem("walletAddress");
@@ -40,14 +63,27 @@ export default function Navbar() {
     }
   }, [walletAddress]);
 
+  useEffect(() => {
+    // connectWallet();
+  }, []);
+
   const connectWallet = async (): Promise<void> => {
     try {
       if (window.ethereum) {
         const provider = new BrowserProvider(window.ethereum);
+<<<<<<< HEAD
         const signer = await provider.getSigner();
         const address = await signer.getAddress();
         setWalletAddress(address);
         setIsRoleModalOpen(true);
+=======
+        const accounts = await provider.send("eth_requestAccounts", []);
+        if (Array.isArray(accounts) && typeof accounts[0] === "string") {
+          setWalletAddress(accounts[0]);
+        } else {
+          throw new Error("Unexpected response format");
+        }
+>>>>>>> c78f2fa4c3381d1626ac846a5fec9160fdb3de99
       } else {
         console.error("MetaMask is not installed");
       }
@@ -59,16 +95,23 @@ export default function Navbar() {
   const getBalance = async (address: string) => {
     try {
       if (window.ethereum) {
+<<<<<<< HEAD
         const provider = new BrowserProvider(window.ethereum);
         const balanceBigInt = await provider.getBalance(address);
         const balanceEther = formatEther(balanceBigInt);
         setBalance(parseFloat(balanceEther).toFixed(4));
+=======
+        // const provider = new BrowserProvider(window.ethereum);
+        // const balance = await provider.getBalance(address);
+        // setBalance(balance.toFixed(4)); // Format balance to 4 decimal places
+>>>>>>> c78f2fa4c3381d1626ac846a5fec9160fdb3de99
       }
     } catch (error) {
       console.error("Failed to fetch balance:", error);
     }
   };
 
+<<<<<<< HEAD
   const handleRoleSelection = async (role: string) => {
     try {
       const response = await fetch("http://localhost:3001/api/save-role", {
@@ -103,41 +146,61 @@ export default function Navbar() {
     navigate("/");
   };
 
+=======
+>>>>>>> c78f2fa4c3381d1626ac846a5fec9160fdb3de99
   return (
-    <header className="bg-white border-b">
+    <header className="bg-[#fff] border-b fixed top-0 left-0 w-[100vw]">
       <nav className="mx-auto flex max-w-7xl items-center justify-between p-4 lg:px-8">
+        {/* Left - Logo */}
         <div className="flex lg:flex-1">
           <NavLink to="/" className="-m-1.5 p-1.5">
             <img alt="Logo" src={Logo} className="h-6 w-auto" />
           </NavLink>
         </div>
 
+        {/* Center - Navigation Links */}
         <div className="hidden lg:flex lg:gap-x-12">
-          <NavLink to="/home" className="text-sm font-semibold leading-6 text-gray-900 hover:text-primary">
-            Home
-          </NavLink>
-          <NavLink to="/disputes" className="text-sm font-semibold leading-6 text-gray-900 hover:text-primary">
+          <NavLink
+            to="/disputes"
+            className="text-sm font-semibold leading-6 text-gray-900"
+          >
             Dispute
           </NavLink>
-          <NavLink to="/dashboard" className="text-sm font-semibold leading-6 text-gray-900 hover:text-primary">
+          <NavLink
+            to="/dashboard"
+            className="text-sm font-semibold leading-6 text-gray-900"
+          >
             Dashboard
           </NavLink>
-          <NavLink to="/awards" className="text-sm font-semibold leading-6 text-gray-900 hover:text-primary">
+          <NavLink
+            to="/awards"
+            className="text-sm font-semibold leading-6 text-gray-900"
+          >
             Awards
           </NavLink>
-          <NavLink to="/profile" className="text-sm font-semibold leading-6 text-gray-900 hover:text-primary">
+          <NavLink
+            to="/profile"
+            className="text-sm font-semibold leading-6 text-gray-900"
+          >
             Profile
+          </NavLink>
+          <NavLink
+            to="/flash-loan"
+            className="text-sm font-semibold leading-6 text-gray-900"
+          >
+            Flash Loan
           </NavLink>
         </div>
 
+        {/* Right - Wallet Connection */}
         <div className="hidden lg:flex lg:flex-1 lg:justify-end">
           {walletAddress ? (
-            <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/profile')}>
+            <div className="flex items-center gap-2">
               <UserCircleIcon className="h-5 w-5 text-gray-900" />
-              <span className="text-sm font-semibold leading-6 text-gray-900 hover:text-primary">
+              <span className="text-sm font-semibold leading-6 text-gray-900">
                 {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
               </span>
-              <span className="text-sm font-semibold leading-6 text-gray-900 hover:text-primary">
+              <span className="text-sm font-semibold leading-6 text-gray-900">
                 ({balance} ETH)
               </span>
               <button onClick={logout} className="ml-4 text-sm font-semibold leading-6 text-gray-900 hover:text-primary">
@@ -147,13 +210,14 @@ export default function Navbar() {
           ) : (
             <button
               onClick={connectWallet}
-              className="text-sm font-semibold leading-6 text-gray-900 border-b-2 border-b-primary cursor-pointer hover:text-primary"
+              className="text-sm font-semibold leading-6 text-gray-900 border-b-2 border-b-[#7DD956]"
             >
               Connect Wallet
             </button>
           )}
         </div>
 
+        {/* Mobile Menu Button */}
         <div className="flex lg:hidden">
           <button
             type="button"
@@ -165,6 +229,7 @@ export default function Navbar() {
         </div>
       </nav>
 
+      {/* Mobile Menu */}
       <div className={mobileMenuOpen ? "block" : "hidden"}>
         <div className="fixed inset-y-0 right-0 z-10 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
           <div className="flex items-center justify-between">
@@ -182,27 +247,44 @@ export default function Navbar() {
           <div className="mt-6 flow-root">
             <div className="-my-6 divide-y divide-gray-500/10">
               <div className="space-y-2 py-6">
-                <NavLink to="/" className="block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
+                <NavLink
+                  to="/"
+                  className="block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                >
                   Home
                 </NavLink>
-                <NavLink to="/profile" className="block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
+                <NavLink
+                  to="/profile"
+                  className="block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                >
                   Profile
                 </NavLink>
+<<<<<<< HEAD
                 <NavLink to="/disputes" className="block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
                   Disputes
+=======
+                <NavLink
+                  to="/disputes"
+                  className="block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                >
+                  Dispute
+>>>>>>> c78f2fa4c3381d1626ac846a5fec9160fdb3de99
                 </NavLink>
-                <NavLink to="/awards" className="block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
+                <NavLink
+                  to="/awards"
+                  className="block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                >
                   Awards
                 </NavLink>
               </div>
               <div className="py-6">
                 {walletAddress ? (
-                  <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/profile')}>
+                  <div className="flex items-center gap-2">
                     <UserCircleIcon className="h-5 w-5 text-gray-900" />
-                    <span className="text-sm font-semibold leading-6 text-gray-900 hover:text-primary">
+                    <span className="text-sm font-semibold leading-6 text-gray-900">
                       {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
                     </span>
-                    <span className="text-sm font-semibold leading-6 text-gray-900 hover:text-primary">
+                    <span className="text-sm font-semibold leading-6 text-gray-900">
                       ({balance} ETH)
                     </span>
                     <button onClick={logout} className="ml-4 text-sm font-semibold leading-6 text-gray-900 hover:text-primary">
@@ -212,7 +294,7 @@ export default function Navbar() {
                 ) : (
                   <button
                     onClick={connectWallet}
-                    className="text-sm font-semibold leading-6 text-gray-900 border-b-2 border-b-primary cursor-pointer hover:text-primary"
+                    className="text-sm font-semibold leading-6 text-gray-900 border-b-2 border-b-[#7DD956]"
                   >
                     Connect Wallet
                   </button>
@@ -222,6 +304,7 @@ export default function Navbar() {
           </div>
         </div>
       </div>
+<<<<<<< HEAD
 
       {isRoleModalOpen && (
   <RoleSelectionModal 
@@ -230,6 +313,8 @@ export default function Navbar() {
     walletAddress={walletAddress} 
   />
 )}    
+=======
+>>>>>>> c78f2fa4c3381d1626ac846a5fec9160fdb3de99
     </header>
   );
 }

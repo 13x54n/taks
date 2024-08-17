@@ -1,0 +1,112 @@
+[
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_uid",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_totalAmount",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_flashLoanAmount",
+				"type": "uint256"
+			},
+			{
+				"internalType": "address payable",
+				"name": "_assignedTo",
+				"type": "address"
+			}
+		],
+		"name": "addJob",
+		"outputs": [],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_uid",
+				"type": "string"
+			}
+		],
+		"name": "getJob",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "string",
+						"name": "uid",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "totalAmount",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "flashLoanAmount",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address payable",
+						"name": "assignedTo",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "employee",
+						"type": "address"
+					},
+					{
+						"internalType": "bool",
+						"name": "isLoanTaken",
+						"type": "bool"
+					}
+				],
+				"internalType": "struct JobTreasury.JobSchema",
+				"name": "",
+				"type": "tuple"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_jobUid",
+				"type": "string"
+			}
+		],
+		"name": "getLoan",
+		"outputs": [],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_jobUid",
+				"type": "string"
+			},
+			{
+				"internalType": "address payable",
+				"name": "_assignedTo",
+				"type": "address"
+			}
+		],
+		"name": "updateJobAssign",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	}
+]

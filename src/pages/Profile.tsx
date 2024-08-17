@@ -98,7 +98,7 @@ const Profile = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-8 space-y-8">
+    <div className="max-w-6xl mx-auto space-y-8">
       <h1 className="text-4xl font-bold mb-8">Profile</h1>
 
       <div className="bg-white p-8 rounded-lg shadow-lg space-y-8">
