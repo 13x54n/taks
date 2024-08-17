@@ -13,6 +13,9 @@
     "typeRoots": ["./node_modules/@types", "./src/types"],
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    "target": "ESNext",
+    "types": ["vite/client"],
+    "lib": ["WebWorker"]
   }
 }

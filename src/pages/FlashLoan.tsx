@@ -1,6 +1,20 @@
 import React from "react";
 
 import Gauge, { GaugeProps } from "@/components/Gauge";
+// import { Button } from "@/components/ui/button"
+// import {
+//   Dialog,
+//   DialogClose,
+//   DialogContent,
+//   DialogDescription,
+//   DialogFooter,
+//   DialogHeader,
+//   DialogTitle,
+//   DialogTrigger,
+// } from "@/components/ui/dialog"
+// import { Input } from "@/components/ui/input"
+// import { Label } from "@/components/ui/label"
+import { getJobData, getLoan } from "@/api/JobTreasury";
 
 type FuelLevelGaugeProps = Pick<GaugeProps, "value">;
 
@@ -29,6 +43,10 @@ const FuelLevelGauge: React.FC<FuelLevelGaugeProps> = ({ value }) => {
 };
 
 export default function FlashLoan() {
+  const handleRequestLoan = async () => {
+    const data = await getLoan();
+    console.log(data)
+  }
   return (
     <div className="container max-w-7xl mx-auto flex">
       <div className="text-sm flex flex-col items-center min-w-[22vw]">
@@ -85,7 +103,7 @@ export default function FlashLoan() {
               <td className="px-6 py-4">5,748 USD</td>
               <td className="px-6 py-4">0x6a68...8dff</td>
               <td className="px-6 py-4">
-                <button className="bg-gray-200 px-1">💵 Request</button>
+                <button className="bg-gray-200 px-1" onClick={() => handleRequestLoan()}>💵 Request</button>
               </td>
             </tr>
             <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
