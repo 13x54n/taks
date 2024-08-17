@@ -5,7 +5,7 @@ import { address, publicClient, walletClient } from "@/utils/ViemConfig";
 // const CONTRACT_ADDRESS = import.meta.env.VITE_JOB_TREASURY_CONTRACT_ADDRESS;
 
 const contract = getContract({
-  address: "0xf66aA8980700F92BF99Af939A1834d6429818515",
+  address: "0xFCc61d21F57FB390b3809E5FA62fe77148BE368C",
   abi: JobTreasuryABI,
   client: {
     public: publicClient,
@@ -21,7 +21,7 @@ export const getLoan = async (jobId: string) => {
   try {
     const { request } = await publicClient.simulateContract({
       account: address[0],
-      address: "0xf66aA8980700F92BF99Af939A1834d6429818515",
+      address: "0xFCc61d21F57FB390b3809E5FA62fe77148BE368C",
       abi: JobTreasuryABI,
       functionName: "getLoan",
       args: [jobId],

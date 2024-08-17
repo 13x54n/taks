@@ -1,8 +1,8 @@
 import { createPublicClient, createWalletClient, http, custom } from "viem";
-import { sepolia } from "viem/chains";
+import { baseSepolia } from "viem/chains";
 
 export const publicClient = createPublicClient({
-  chain: sepolia,
+  chain: baseSepolia,
   transport: http(),
 });
 
@@ -17,6 +17,6 @@ console.log(address);
 // eg: Metamask
 export const walletClient = createWalletClient({
   account: address[0],
-  chain: sepolia,
+  chain: baseSepolia,
   transport: custom(window.ethereum!),
 });
