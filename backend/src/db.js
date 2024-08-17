@@ -1,4 +1,4 @@
-// src/db.js
+/* eslint-disable no-undef */
 import pkg from "pg";
 
 const { Pool } = pkg;

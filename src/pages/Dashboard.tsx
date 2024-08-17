@@ -59,7 +59,7 @@ const Dashboard = () => {
         <div className="mb-8">
           <button
             onClick={() => setShowJobForm(!showJobForm)}
-            className="bg-blue-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-600 transition duration-200"
+            className="bg-gray-500 text-black font-bold py-3 px-6 rounded-lg hover:bg-gray-600 transition duration-200 border"
           >
             {showJobForm ? 'Hide Job Form' : 'Create Job'}
           </button>

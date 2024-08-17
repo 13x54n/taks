@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
 interface WalletContextProps {
   walletAddress: string;
@@ -17,13 +17,24 @@ export const useWallet = () => {
   return context;
 };
 
-export const WalletProvider: React.FC = ({ children }) => {
-  const [walletAddress, setWalletAddress] = useState<string>("");
+interface WalletProviderProps {
+  children: ReactNode;
+}
+
+export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
+  const [walletAddress, setWalletAddress] = useState<string>(() => {
+    // Retrieve the wallet address from localStorage if it exists
+    return localStorage.getItem("walletAddress") || "";
+  });
   const [role, setRole] = useState<string>("");
 
   useEffect(() => {
     if (walletAddress) {
+      // Store the wallet address in localStorage
+      localStorage.setItem("walletAddress", walletAddress);
       fetchUserRole(walletAddress);
+    } else {
+      localStorage.removeItem("walletAddress");
     }
   }, [walletAddress]);
 

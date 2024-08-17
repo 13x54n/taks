@@ -1,27 +1,20 @@
 import React, { useState } from 'react';
-import { useWallet } from '../context/WalletContext';
+import { useWallet } from '@/context/WalletContext';
 
 interface JobApplicationFormProps {
-  jobId: number;
+  jobId: string;
   onApplicationSubmitted: () => void;
 }
 
 const JobApplicationForm: React.FC<JobApplicationFormProps> = ({ jobId, onApplicationSubmitted }) => {
-  const { walletAddress } = useWallet();
   const [coverLetter, setCoverLetter] = useState('');
-  const [resumeLink, setResumeLink] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const [bidAmount, setBidAmount] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { walletAddress } = useWallet();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
-    setSuccess(null);
-
-    if (!coverLetter) {
-      setError('Cover letter is required.');
-      return;
-    }
+    setIsSubmitting(true);
 
     try {
       const response = await fetch('http://localhost:3001/api/apply-job', {
@@ -31,58 +24,67 @@ const JobApplicationForm: React.FC<JobApplicationFormProps> = ({ jobId, onApplic
         },
         body: JSON.stringify({
           jobId,
-          employeeWalletAddress: walletAddress,
+          applicantAddress: walletAddress,
           coverLetter,
-          resumeLink,
+          bidAmount,
         }),
       });
 
       if (response.ok) {
-        setSuccess('Application submitted successfully!');
         onApplicationSubmitted();
       } else {
-        setError('Failed to submit application. (job application form)');
+        const errorData = await response.json();
+        console.error('Application submission failed:', errorData);
+        // You might want to show an error message to the user here
       }
     } catch (error) {
-      setError('An error occurred while submitting the application.');
+      console.error('Error submitting application:', error);
+      // You might want to show an error message to the user here
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-xl font-bold mb-4">Apply for Job</h2>
-      {error && <p className="text-red-500 mb-4">{error}</p>}
-      {success && <p className="text-green-500 mb-4">{success}</p>}
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label className="block text-gray-700 font-medium mb-2">
-            Cover Letter
-          </label>
-          <textarea
-            value={coverLetter}
-            onChange={(e) => setCoverLetter(e.target.value)}
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 font-medium mb-2">
-            Resume Link (optional)
-          </label>
-          <input
-            type="text"
-            value={resumeLink}
-            onChange={(e) => setResumeLink(e.target.value)}
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-        <button
-          type="submit"
-          className="bg-blue-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-600 transition duration-200"
-        >
-          Submit Application
-        </button>
-      </form>
-    </div>
+    <form onSubmit={handleSubmit} className="mt-4">
+      <div className="mb-4">
+        <label htmlFor="coverLetter" className="block text-sm font-medium text-gray-700">
+          Cover Letter
+        </label>
+        <textarea
+          id="coverLetter"
+          value={coverLetter}
+          onChange={(e) => setCoverLetter(e.target.value)}
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+          rows={4}
+          required
+        />
+      </div>
+      <div className="mb-4">
+        <label htmlFor="bidAmount" className="block text-sm font-medium text-gray-700">
+          Bid Amount (in ETH)
+        </label>
+        <input
+          type="number"
+          id="bidAmount"
+          value={bidAmount}
+          onChange={(e) => setBidAmount(e.target.value)}
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+          required
+          step="0.01"
+          min="0"
+        />
+      </div>
+      <button
+        type="submit"
+        disabled={isSubmitting}
+        className={`w-full px-4 py-2 text-white font-bold rounded-md ${
+          isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-700'
+        }`}
+      >
+        {isSubmitting ? 'Submitting...' : 'Submit Application'}
+      </button>
+    </form>
   );
 };
 

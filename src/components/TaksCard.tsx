@@ -8,6 +8,7 @@ import {
 } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { useWallet } from "@/context/WalletContext";
+import JobApplicationForm from "./JobApplicationForm"; // Import the form
 
 const formatDate = (dateString: string) => {
   const options: Intl.DateTimeFormatOptions = {
@@ -21,7 +22,7 @@ const formatDate = (dateString: string) => {
 };
 
 interface TaksCardProps {
-  jobId: number;
+  jobId: string; // Use string instead of number for UUID
   title: string;
   description: string;
   creator: string;
@@ -43,10 +44,6 @@ export default function TaksCard({
 }: TaksCardProps) {
   const [open, setOpen] = useState(false);
   const [applying, setApplying] = useState(false);
-  const [applicationText, setApplicationText] = useState("");
-  const [resumeLink, setResumeLink] = useState("");
-  const [success, setSuccess] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [hasApplied, setHasApplied] = useState(false);
   const { walletAddress, role } = useWallet();
 
@@ -68,48 +65,10 @@ export default function TaksCard({
     }
   }, [jobId, walletAddress, role]);
 
-  const handleApplyJob = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setSuccess(null);
-
-    if (!applicationText) {
-        setError("Please provide a reason for applying.");
-        return;
-    }
-
-    const payload = {
-        jobId,
-        employeeWalletAddress: walletAddress,
-        coverLetter: applicationText,
-        resumeLink,
-    };
-
-    console.log("Sending payload:", payload);
-
-    try {
-        const response = await fetch("http://localhost:3001/api/apply-job", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(payload),
-        });
-
-        if (response.ok) {
-            setSuccess("Application submitted successfully!");
-            setApplicationText("");
-            setApplying(false);
-            setHasApplied(true);
-        } else {
-            const errorMessage = await response.text();
-            setError(`Failed to submit application. Server response: ${errorMessage}`);
-        }
-    } catch (error) {
-        setError(`An error occurred while submitting the application: ${error.message}`);
-    }
-};
-
+  const handleApplicationSubmitted = () => {
+    setOpen(false);
+    setHasApplied(true);
+  };
 
   return (
     <div
@@ -220,40 +179,13 @@ export default function TaksCard({
                           </button>
                         )}
 
-                        {hasApplied && (
-                          <button
-                            className="bg-red-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-700 transition duration-200 w-full"
-                          >
-                            Apply Dispute
-                          </button>
+                        {applying && (
+                          <JobApplicationForm
+                            jobId={jobId} // Pass the jobId as a string
+                            onApplicationSubmitted={handleApplicationSubmitted}
+                          />
                         )}
                       </div>
-                    )}
-
-                    {applying && (
-                      <form onSubmit={handleApplyJob} className="mt-4">
-                        <textarea
-                          value={applicationText}
-                          onChange={(e) => setApplicationText(e.target.value)}
-                          placeholder="Why do you want to apply for this job?"
-                          className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
-                        />
-                        <input
-                          type="text"
-                          value={resumeLink}
-                          onChange={(e) => setResumeLink(e.target.value)}
-                          placeholder="Link to your resume (optional)"
-                          className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
-                        />
-                        {error && <p className="text-red-500 mb-2">{error}</p>}
-                        {success && <p className="text-green-500 mb-2">{success}</p>}
-                        <button
-                          type="submit"
-                          className="w-full bg-green-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-700 transition duration-200"
-                        >
-                          Submit Application
-                        </button>
-                      </form>
                     )}
                   </div>
                 </div>

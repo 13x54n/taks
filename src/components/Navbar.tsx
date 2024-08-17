@@ -1,11 +1,18 @@
 import { useState, useEffect } from "react";
-import { BrowserProvider } from "ethers";
+import { BrowserProvider, formatEther } from "ethers";
 import { useNavigate, NavLink } from "react-router-dom";
 import { Bars3Icon, XMarkIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 import RoleSelectionModal from "./ui/RoleSelectionModel";
 import Logo from "../../public/logo.png";
 import { useWallet } from "../context/WalletContext";
 
+// Add global declaration for TypeScript
+declare global {
+  interface Window {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ethereum?: any;
+  }
+}
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [balance, setBalance] = useState<string>("");
@@ -14,8 +21,22 @@ export default function Navbar() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const savedWalletAddress = localStorage.getItem("walletAddress");
+    const savedRole = localStorage.getItem("userRole");
+    if (savedWalletAddress) {
+      setWalletAddress(savedWalletAddress);
+      if (savedRole) {
+        setRole(savedRole);
+      }
+    }
+  }, [setWalletAddress, setRole]);
+
+  useEffect(() => {
     if (walletAddress) {
+      localStorage.setItem("walletAddress", walletAddress);
       getBalance(walletAddress);
+    } else {
+      localStorage.removeItem("walletAddress");
     }
   }, [walletAddress]);
 
@@ -23,13 +44,10 @@ export default function Navbar() {
     try {
       if (window.ethereum) {
         const provider = new BrowserProvider(window.ethereum);
-        const accounts = await provider.send("eth_requestAccounts", []);
-        if (Array.isArray(accounts) && typeof accounts[0] === 'string') {
-          setWalletAddress(accounts[0]);
-          setIsRoleModalOpen(true);
-        } else {
-          throw new Error("Unexpected response format");
-        }
+        const signer = await provider.getSigner();
+        const address = await signer.getAddress();
+        setWalletAddress(address);
+        setIsRoleModalOpen(true);
       } else {
         console.error("MetaMask is not installed");
       }
@@ -42,8 +60,9 @@ export default function Navbar() {
     try {
       if (window.ethereum) {
         const provider = new BrowserProvider(window.ethereum);
-        const balance = await provider.getBalance(address);
-        setBalance(parseFloat(balance).toFixed(4));
+        const balanceBigInt = await provider.getBalance(address);
+        const balanceEther = formatEther(balanceBigInt);
+        setBalance(parseFloat(balanceEther).toFixed(4));
       }
     } catch (error) {
       console.error("Failed to fetch balance:", error);
@@ -59,19 +78,29 @@ export default function Navbar() {
         },
         body: JSON.stringify({ walletAddress, role }),
       });
-
+  
       if (response.ok) {
-        setRole(role); // Update the role in the context
-        navigate("/profile");
+        setRole(role);
+        localStorage.setItem("userRole", role); // Save the role to local storage
+        setIsRoleModalOpen(false); // Close the modal after successful save
+        navigate("/profile"); // Redirect to profile page
       } else {
         const errorData = await response.json();
         console.error("Failed to save role:", errorData);
+        // You might want to show an error message to the user here
       }
     } catch (error) {
       console.error("Error:", error);
+      // You might want to show an error message to the user here
     }
+  };
 
-    setIsRoleModalOpen(false);
+  const logout = () => {
+    setWalletAddress("");
+    setRole("");
+    localStorage.removeItem("walletAddress");
+    localStorage.removeItem("userRole");
+    navigate("/");
   };
 
   return (
@@ -111,6 +140,9 @@ export default function Navbar() {
               <span className="text-sm font-semibold leading-6 text-gray-900 hover:text-primary">
                 ({balance} ETH)
               </span>
+              <button onClick={logout} className="ml-4 text-sm font-semibold leading-6 text-gray-900 hover:text-primary">
+                Logout
+              </button>
             </div>
           ) : (
             <button
@@ -157,7 +189,7 @@ export default function Navbar() {
                   Profile
                 </NavLink>
                 <NavLink to="/disputes" className="block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
-                  Dispute
+                  Disputes
                 </NavLink>
                 <NavLink to="/awards" className="block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
                   Awards
@@ -173,6 +205,9 @@ export default function Navbar() {
                     <span className="text-sm font-semibold leading-6 text-gray-900 hover:text-primary">
                       ({balance} ETH)
                     </span>
+                    <button onClick={logout} className="ml-4 text-sm font-semibold leading-6 text-gray-900 hover:text-primary">
+                      Logout
+                    </button>
                   </div>
                 ) : (
                   <button
@@ -189,12 +224,12 @@ export default function Navbar() {
       </div>
 
       {isRoleModalOpen && (
-        <RoleSelectionModal 
-          onSelectRole={handleRoleSelection}
-          onClose={() => setIsRoleModalOpen(false)} 
-          walletAddress={walletAddress} 
-        />
-      )}
+  <RoleSelectionModal 
+    onSelectRole={handleRoleSelection}
+    onClose={() => setIsRoleModalOpen(false)} 
+    walletAddress={walletAddress} 
+  />
+)}    
     </header>
   );
 }
