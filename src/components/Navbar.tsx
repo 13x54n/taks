@@ -1,18 +1,8 @@
 import { useState, useEffect } from "react";
-<<<<<<< HEAD
 import { BrowserProvider, formatEther } from "ethers";
 import { useNavigate, NavLink } from "react-router-dom";
 import { Bars3Icon, XMarkIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 import RoleSelectionModal from "./ui/RoleSelectionModel";
-=======
-import { BrowserProvider } from "ethers";
-import { NavLink } from "react-router-dom";
-import {
-  Bars3Icon,
-  XMarkIcon,
-  UserCircleIcon,
-} from "@heroicons/react/24/outline";
->>>>>>> c78f2fa4c3381d1626ac846a5fec9160fdb3de99
 import Logo from "../../public/logo.png";
 
 declare global {
@@ -71,19 +61,10 @@ export default function Navbar() {
     try {
       if (window.ethereum) {
         const provider = new BrowserProvider(window.ethereum);
-<<<<<<< HEAD
         const signer = await provider.getSigner();
         const address = await signer.getAddress();
         setWalletAddress(address);
         setIsRoleModalOpen(true);
-=======
-        const accounts = await provider.send("eth_requestAccounts", []);
-        if (Array.isArray(accounts) && typeof accounts[0] === "string") {
-          setWalletAddress(accounts[0]);
-        } else {
-          throw new Error("Unexpected response format");
-        }
->>>>>>> c78f2fa4c3381d1626ac846a5fec9160fdb3de99
       } else {
         console.error("MetaMask is not installed");
       }
@@ -95,23 +76,16 @@ export default function Navbar() {
   const getBalance = async (address: string) => {
     try {
       if (window.ethereum) {
-<<<<<<< HEAD
         const provider = new BrowserProvider(window.ethereum);
         const balanceBigInt = await provider.getBalance(address);
         const balanceEther = formatEther(balanceBigInt);
         setBalance(parseFloat(balanceEther).toFixed(4));
-=======
-        // const provider = new BrowserProvider(window.ethereum);
-        // const balance = await provider.getBalance(address);
-        // setBalance(balance.toFixed(4)); // Format balance to 4 decimal places
->>>>>>> c78f2fa4c3381d1626ac846a5fec9160fdb3de99
       }
     } catch (error) {
       console.error("Failed to fetch balance:", error);
     }
   };
 
-<<<<<<< HEAD
   const handleRoleSelection = async (role: string) => {
     try {
       const response = await fetch("http://localhost:3001/api/save-role", {
@@ -146,8 +120,6 @@ export default function Navbar() {
     navigate("/");
   };
 
-=======
->>>>>>> c78f2fa4c3381d1626ac846a5fec9160fdb3de99
   return (
     <header className="bg-[#fff] border-b fixed top-0 left-0 w-[100vw]">
       <nav className="mx-auto flex max-w-7xl items-center justify-between p-4 lg:px-8">
@@ -259,16 +231,8 @@ export default function Navbar() {
                 >
                   Profile
                 </NavLink>
-<<<<<<< HEAD
                 <NavLink to="/disputes" className="block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
                   Disputes
-=======
-                <NavLink
-                  to="/disputes"
-                  className="block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
-                >
-                  Dispute
->>>>>>> c78f2fa4c3381d1626ac846a5fec9160fdb3de99
                 </NavLink>
                 <NavLink
                   to="/awards"
@@ -304,7 +268,6 @@ export default function Navbar() {
           </div>
         </div>
       </div>
-<<<<<<< HEAD
 
       {isRoleModalOpen && (
   <RoleSelectionModal 
@@ -313,8 +276,6 @@ export default function Navbar() {
     walletAddress={walletAddress} 
   />
 )}    
-=======
->>>>>>> c78f2fa4c3381d1626ac846a5fec9160fdb3de99
     </header>
   );
 }
