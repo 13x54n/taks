@@ -16,7 +16,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <div className="relative">
       <Navbar />
-      <div className="mt-20">{children}</div>
+      <div>{children}</div>
     </div>
   );
 };
@@ -86,7 +86,6 @@ export const router = createBrowserRouter([
     path: "/flash-loan",
     element: (
       <Layout>
-        <Navbar />
         <FlashLoan />
       </Layout>
     ),

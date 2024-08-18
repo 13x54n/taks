@@ -88,10 +88,7 @@ export default function Navbar() {
         </div>
 
         {/* Center - Navigation Links */}
-        <div className=" lg:flex lg:gap-x-12">
-          <NavLink to="/home" className="text-sm font-semibold leading-6 text-gray-900">
-            Home
-          </NavLink>
+        <div className="hidden lg:flex lg:gap-x-12">
           <NavLink to="/disputes" className="text-sm font-semibold leading-6 text-gray-900">
             Dispute
           </NavLink>
@@ -101,8 +98,8 @@ export default function Navbar() {
           <NavLink to="/awards" className="text-sm font-semibold leading-6 text-gray-900">
             Awards
           </NavLink>
-          <NavLink to="/profile" className="text-sm font-semibold leading-6 text-gray-900">
-            Profile
+          <NavLink to="/flash-loan" className="text-sm font-semibold leading-6 text-gray-900">
+            Flash Loan
           </NavLink>
         </div>
 
@@ -115,7 +112,7 @@ export default function Navbar() {
                 {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
               </span>
               <span className="text-sm font-semibold leading-6 text-gray-900">
-                ({balance} ETH)
+                {/* ({balance} ETH) */}
               </span>
             </div>
           ) : (
