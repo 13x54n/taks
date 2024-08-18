@@ -1,8 +1,11 @@
-const express = require("express");
-const multer = require("multer");
-const crypto = require("crypto");
-const { Pool } = require("pg");
-const fs = require("fs");
+import express from "express";
+import multer from "multer";
+import crypto from "crypto";
+import pkg from "pg";
+import fs from "fs";
+
+const { Pool } = pkg;
+
 const app = express();
 const port = 3001;
 
