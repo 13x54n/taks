@@ -44,7 +44,7 @@ const FuelLevelGauge: React.FC<FuelLevelGaugeProps> = ({ value }) => {
 
 export default function FlashLoan() {
   const handleRequestLoan = async () => {
-    const data = await getLoan("project");
+    const data = await getJobData("project");
     console.log(data)
   }
   return (
