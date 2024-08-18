@@ -8,9 +8,6 @@ export const content = [
 ];
 export const prefix = "";
 export const theme = {
-  colors: {
-    primary: "#7DD956",
-  },
   container: {
     center: true,
     padding: "2rem",
@@ -19,6 +16,9 @@ export const theme = {
     },
   },
   extend: {
+    colors: {
+      primary: "#7DD956",
+    },
     keyframes: {
       "accordion-down": {
         from: { height: "0" },

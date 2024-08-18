@@ -3,6 +3,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 
 interface RoleContextProps {
   role: string;
+  setRole: (role: string) => void;
   fetchUserRole: (walletAddress: string) => void;
 }
 
@@ -21,7 +22,9 @@ interface RoleProviderProps {
 }
 
 export const RoleProvider: React.FC<RoleProviderProps> = ({ children }) => {
-  const [role, setRole] = useState<string>("");
+  const [role, setRole] = useState<string>(() => {
+    return localStorage.getItem("userRole") || "";
+  });
 
   const fetchUserRole = async (walletAddress: string) => {
     try {
@@ -39,8 +42,16 @@ export const RoleProvider: React.FC<RoleProviderProps> = ({ children }) => {
     }
   };
 
+  useEffect(() => {
+    if (role) {
+      localStorage.setItem("userRole", role);
+    } else {
+      localStorage.removeItem("userRole");
+    }
+  }, [role]);
+
   return (
-    <RoleContext.Provider value={{ role, fetchUserRole }}>
+    <RoleContext.Provider value={{ role, setRole, fetchUserRole }}>
       {children}
     </RoleContext.Provider>
   );
