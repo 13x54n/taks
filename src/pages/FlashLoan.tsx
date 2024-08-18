@@ -48,7 +48,7 @@ export default function FlashLoan() {
     console.log(data)
   }
   return (
-    <div className="container max-w-7xl mx-auto flex">
+    <div className="container max-w-7xl mx-auto flex mt-8">
       <div className="text-sm flex flex-col items-center min-w-[22vw]">
         <h1 className="text-lg mb-3 font-medium">Credit Report</h1>
         <FuelLevelGauge value={20} />
