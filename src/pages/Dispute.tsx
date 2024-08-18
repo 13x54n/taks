@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ScaleIcon,
@@ -85,7 +85,7 @@ const Dispute = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-8 space-y-8">
+    <div className="max-w-6xl mx-auto space-y-8">
       <h1 className="text-4xl font-bold mb-8">Disputes</h1>
 
       <div className="flex justify-between items-center mb-8">

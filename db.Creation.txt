@@ -1,0 +1,42 @@
+-- Create the Users table
+CREATE TABLE Users (
+    user_id VARCHAR(255) PRIMARY KEY, -- Address (Wallet Address)
+    reputation NUMERIC(78, 0) DEFAULT 0, -- User reputation as Uint256
+    employer_reputation NUMERIC(78, 0) DEFAULT 0 -- Employer reputation as Uint256
+);
+
+
+-- Create the Jobs table with the transaction_hash column
+CREATE TABLE Jobs (
+    job_id UUID PRIMARY KEY DEFAULT gen_random_uuid(), -- Job ID as UUID
+    title VARCHAR(255) NOT NULL, -- Job title as String
+    description TEXT NOT NULL, -- Job description as Text
+    employer VARCHAR(255) REFERENCES Users(user_id) ON DELETE SET NULL, -- Employer as Address (Wallet Address), Foreign Key to Users
+    payment NUMERIC(78, 0) NOT NULL, -- Payment as Uint256
+    is_filled BOOLEAN DEFAULT FALSE, -- Boolean to check if the job is filled
+    employee VARCHAR(255) REFERENCES Users(user_id) ON DELETE SET NULL, -- Employee as Address (Wallet Address), Foreign Key to Users
+    timestamp NUMERIC(78, 0) NOT NULL, -- Timestamp as Uint256
+    expiry_time NUMERIC(78, 0) NOT NULL, -- Job expiry time as Uint256
+    eligible_for_flash_loans BOOLEAN DEFAULT FALSE, -- Flash loan eligibility as Boolean
+    transaction_hash VARCHAR(255) NOT NULL -- Transaction hash as String
+);
+
+
+
+-- Create the Applications table
+CREATE TABLE Applications (
+    application_id UUID PRIMARY KEY DEFAULT gen_random_uuid(), -- Application ID as UUID
+    job_id UUID REFERENCES Jobs(job_id) ON DELETE CASCADE, -- Job ID as UUID, Foreign Key to Jobs
+    applicant VARCHAR(255) REFERENCES Users(user_id) ON DELETE CASCADE, -- Applicant as Address (Wallet Address), Foreign Key to Users
+    resume_id VARCHAR(255) NOT NULL, -- Resume ID as String
+    timestamp NUMERIC(78, 0) NOT NULL -- Timestamp as Uint256
+);
+
+
+-- Create the Roles table
+CREATE TABLE Roles (
+    id SERIAL PRIMARY KEY, -- Auto-incremented ID for each role
+    wallet_address VARCHAR(255) NOT NULL REFERENCES Users(user_id) ON DELETE CASCADE, -- Address (Wallet Address), Foreign Key to Users
+    role VARCHAR(50) NOT NULL, -- Role name (e.g., admin, employer, employee)
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Timestamp of when the role was assigned
+);
