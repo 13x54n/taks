@@ -8,21 +8,15 @@ import {
 } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { useWallet } from "@/context/WalletContext";
-import JobApplicationForm from "./JobApplicationForm"; // Import the form
+import { useRole } from "@/context/RoleContext"; 
+import JobApplicationForm from "./JobApplicationForm";
 
-const formatDate = (dateString: string) => {
-  const options: Intl.DateTimeFormatOptions = {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric',
-  };
-  return new Date(dateString).toLocaleDateString(undefined, options);
+const formatDate = (timestamp: string) => {
+  return new Date(parseInt(timestamp) * 1000).toLocaleString();
 };
 
 interface TaksCardProps {
-  jobId: string; // Use string instead of number for UUID
+  jobId: string;
   title: string;
   description: string;
   creator: string;
@@ -32,7 +26,7 @@ interface TaksCardProps {
   transactionHash: string;
 }
 
-export default function TaksCard({
+const TaksCard = ({
   jobId,
   title,
   description,
@@ -41,33 +35,41 @@ export default function TaksCard({
   timePosted,
   tokenStake,
   transactionHash,
-}: TaksCardProps) {
+}: TaksCardProps) => {
   const [open, setOpen] = useState(false);
-  const [applying, setApplying] = useState(false);
-  const [hasApplied, setHasApplied] = useState(false);
-  const { walletAddress, role } = useWallet();
+  const [applying, setApplying] = useState(false); // Track if the user is applying
+  const [hasApplied, setHasApplied] = useState(false); // Track if the user has applied
+  const { walletAddress } = useWallet(); 
+  const { role } = useRole(); 
 
   useEffect(() => {
     if (role === "Employee") {
       const checkApplicationStatus = async () => {
+        if (!jobId || !walletAddress) {
+          console.error("Invalid jobId or walletAddress", { jobId, walletAddress });
+          return;
+        }
+  
         try {
           const response = await fetch(
             `http://localhost:3001/api/has-applied/${jobId}/${walletAddress}`
           );
           const data = await response.json();
+  
+          console.log('Application Status Data:', data);
           setHasApplied(data.hasApplied);
         } catch (error) {
           console.error("Error checking application status:", error);
         }
       };
-
+  
       checkApplicationStatus();
     }
   }, [jobId, walletAddress, role]);
 
   const handleApplicationSubmitted = () => {
-    setOpen(false);
-    setHasApplied(true);
+    setHasApplied(true); // Mark as applied
+    setApplying(false); // Hide the form after submission
   };
 
   return (
@@ -163,27 +165,25 @@ export default function TaksCard({
 
                     {role === "Employee" && (
                       <div className="mt-6">
-                        {!hasApplied ? (
-                          <button
-                            onClick={() => setApplying(true)}
-                            className="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200 w-full mb-2"
-                          >
-                            Apply Job
-                          </button>
-                        ) : (
+                        {applying ? (
+                          <JobApplicationForm
+                            jobId={jobId} // Automatically associate the job ID
+                            onApplicationSubmitted={handleApplicationSubmitted}
+                          />
+                        ) : hasApplied ? (
                           <button
                             disabled
                             className="bg-green-500 text-white font-bold py-2 px-4 rounded-lg transition duration-200 w-full mb-2"
                           >
                             Applied
                           </button>
-                        )}
-
-                        {applying && (
-                          <JobApplicationForm
-                            jobId={jobId} // Pass the jobId as a string
-                            onApplicationSubmitted={handleApplicationSubmitted}
-                          />
+                        ) : (
+                          <button
+                            onClick={() => setApplying(true)}
+                            className="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200 w-full mb-2"
+                          >
+                            Apply Job
+                          </button>
                         )}
                       </div>
                     )}
@@ -196,4 +196,6 @@ export default function TaksCard({
       </Dialog>
     </div>
   );
-}
+};
+
+export default TaksCard;

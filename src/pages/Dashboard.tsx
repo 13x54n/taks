@@ -67,13 +67,6 @@ const Dashboard = () => {
     fetchJobs();
   };
 
-  const handleLogout = () => {
-    setWalletAddress('');
-    setRole('');
-    localStorage.removeItem('walletAddress');
-    localStorage.removeItem('userRole');
-  };
-
   return (
     <motion.div
       className="max-w-6xl mx-auto space-y-8"
@@ -81,7 +74,7 @@ const Dashboard = () => {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
-      <h1 className="text-4xl font-bold mb-8 text-gray-800">Dashboard</h1>
+      <h1 className="text-4xl font-bold mb-8 text-gray-800 mt-20">Dashboard</h1>
 
       {role === 'Employer' && (
         <div className="mb-8">
@@ -113,14 +106,6 @@ const Dashboard = () => {
           )}
         </div>
       )}
-
-      <motion.button
-        onClick={handleLogout}
-        className="text-red-500 font-bold py-2 px-4 rounded-lg border border-red-500 hover:bg-red-500 hover:text-white transition duration-200"
-        whileHover={{ scale: 1.05 }}
-      >
-        Logout
-      </motion.button>
 
       {/* Tabs */}
       <div className="mb-8">

@@ -40,7 +40,7 @@ router.get("/job-applications/:jobId", async (req, res) => {
 
 // Apply for a job
 router.post("/apply-job", async (req, res) => {
-  const { jobId, applicant, resumeId, timestamp } = req.body;
+  const { jobId, applicant, resumeId, timestamp, coverLetter } = req.body;
 
   if (!jobId || !applicant || !resumeId || !timestamp) {
     return res
@@ -50,8 +50,8 @@ router.post("/apply-job", async (req, res) => {
 
   try {
     const result = await pool.query(
-      "INSERT INTO Applications (job_id, applicant, resume_id, timestamp) VALUES ($1, $2, $3, $4) RETURNING *",
-      [jobId, applicant, resumeId, timestamp]
+      "INSERT INTO Applications (job_id, applicant, resume_id, timestamp, cover_letter) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+      [jobId, applicant, resumeId, timestamp, coverLetter || null] // Insert coverLetter if provided, else null
     );
 
     if (result.rows.length > 0) {

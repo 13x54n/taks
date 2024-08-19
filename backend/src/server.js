@@ -5,7 +5,7 @@ import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import pool from "./db.js";
 import usersRouter from "./routes/users.js";
-import indexRouter from "./routes/index.js"; // Consolidated index file
+import indexRouter from "./routes/index.js";
 
 dotenv.config();
 
