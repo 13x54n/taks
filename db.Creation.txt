@@ -50,3 +50,25 @@ ADD COLUMN hired BOOLEAN DEFAULT FALSE; -- Boolean to indicate if the applicant 
 -- Update the Jobs table to ensure it can store the employee who was hired
 ALTER TABLE Jobs
 ALTER COLUMN employee SET NOT NULL; -- Make sure the employee field is NOT NULL after hiring
+
+
+-- questions
+CREATE TABLE questions (
+    id SERIAL PRIMARY KEY, 
+    question TEXT NOT NULL
+);
+
+
+
+-- verification table
+CREATE TABLE verifications (
+    id SERIAL PRIMARY KEY,
+    user_id VARCHAR(255) NOT NULL,
+    role VARCHAR(255) NOT NULL,
+    video_hash VARCHAR(64) NOT NULL,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    verified BOOLEAN DEFAULT FALSE,
+    questions JSONB NOT NULL
+);
+
+
