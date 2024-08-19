@@ -22,25 +22,9 @@ router.get("/employer-applications", async (req, res) => {
   }
 });
 
-// Get the count of applications for a specific job
-router.get("/job-applications/:jobId", async (req, res) => {
-  const { jobId } = req.params;
-
-  try {
-    const result = await pool.query(
-      "SELECT COUNT(*) AS application_count FROM Applications WHERE job_id = $1",
-      [jobId]
-    );
-    res.json({ applicationCount: result.rows[0].application_count });
-  } catch (error) {
-    console.error("Error fetching job applications:", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-});
-
 // Apply for a job
 router.post("/apply-job", async (req, res) => {
-  const { jobId, applicant, resumeId, timestamp, coverLetter } = req.body;
+  const { jobId, applicant, resumeId, coverLetter, timestamp } = req.body;
 
   if (!jobId || !applicant || !resumeId || !timestamp) {
     return res
@@ -50,8 +34,8 @@ router.post("/apply-job", async (req, res) => {
 
   try {
     const result = await pool.query(
-      "INSERT INTO Applications (job_id, applicant, resume_id, timestamp, cover_letter) VALUES ($1, $2, $3, $4, $5) RETURNING *",
-      [jobId, applicant, resumeId, timestamp, coverLetter || null] // Insert coverLetter if provided, else null
+      "INSERT INTO Applications (job_id, applicant, resume_id, cover_letter, timestamp) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+      [jobId, applicant, resumeId, coverLetter, timestamp]
     );
 
     if (result.rows.length > 0) {
@@ -70,13 +54,40 @@ router.post("/apply-job", async (req, res) => {
   }
 });
 
+// Mark an applicant as hired
+// Endpoint to hire an applicant
+router.post("/hire-applicant", async (req, res) => {
+  const { jobId, applicant } = req.body;
+
+  if (!jobId || !applicant) {
+    return res
+      .status(400)
+      .json({ error: "Invalid jobId or applicant address" });
+  }
+
+  try {
+    // Update the job to mark it as filled and set the employee
+    const result = await pool.query(
+      "UPDATE Jobs SET is_filled = TRUE, employee = $1 WHERE job_id = $2 RETURNING *",
+      [applicant, jobId]
+    );
+
+    if (result.rows.length > 0) {
+      res
+        .status(200)
+        .json({ message: "Applicant hired successfully", job: result.rows[0] });
+    } else {
+      res.status(500).json({ error: "Failed to hire applicant" });
+    }
+  } catch (error) {
+    console.error("Error hiring applicant:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 // Check if a specific employee has already applied for a specific job
 router.get("/has-applied/:jobId/:applicant", async (req, res) => {
   const { jobId, applicant } = req.params;
-
-  // Add debug logs
-  console.log("Job ID:", jobId);
-  console.log("Applicant:", applicant);
 
   if (!jobId || !applicant) {
     return res
@@ -94,6 +105,44 @@ router.get("/has-applied/:jobId/:applicant", async (req, res) => {
     res.json({ hasApplied });
   } catch (error) {
     console.error("Error checking application status:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// Get all applications for a specific employee
+router.get("/employee-applications", async (req, res) => {
+  const { employeeWalletAddress } = req.query;
+  try {
+    const result = await pool.query(
+      `SELECT Applications.*, Jobs.title AS job_title, Jobs.description, Jobs.payment, Jobs.employer, Jobs.is_filled AS is_hired, Jobs.eligible_for_flash_loans 
+       FROM Applications 
+       JOIN Jobs ON Applications.job_id = Jobs.job_id 
+       WHERE Applications.applicant = $1 
+       ORDER BY Applications.timestamp DESC`,
+      [employeeWalletAddress]
+    );
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Error fetching employee applications:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// Request flash loan for a job
+router.post("/request-flash-loan", async (req, res) => {
+  const { jobId, employee, loanAmount } = req.body;
+
+  if (!jobId || !employee || !loanAmount) {
+    return res
+      .status(400)
+      .json({ error: "All required fields must be provided." });
+  }
+
+  try {
+    // Implement flash loan logic here
+    res.status(201).json({ message: "Flash loan requested successfully." });
+  } catch (error) {
+    console.error("Error requesting flash loan:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });

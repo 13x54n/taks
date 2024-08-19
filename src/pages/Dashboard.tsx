@@ -5,11 +5,13 @@ import { useWallet } from '../context/WalletContext';
 import { useRole } from '../context/RoleContext';
 import { motion } from 'framer-motion';
 import JobCreationForm from '@/components/JobCreationForm';
+import EmployeeDashboard from './EmployeeDashboard';
+
 
 ChartJS.register(ArcElement, Tooltip, Legend, Title);
 
 const Dashboard = () => {
-  const { walletAddress, setWalletAddress } = useWallet();
+  const { walletAddress } = useWallet();
   const { role, setRole } = useRole();
   const [activeTab, setActiveTab] = useState('Jobs');
   const [showJobForm, setShowJobForm] = useState(false);
@@ -46,6 +48,28 @@ const Dashboard = () => {
     }
   };
 
+  const handleHire = async (jobId, applicant) => {
+    try {
+      const response = await fetch(`http://localhost:3001/api/hire-applicant`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ jobId, applicant }),
+      });
+
+      if (response.ok) {
+        alert('Applicant hired successfully');
+        fetchJobs(); // Refresh job data to reflect the hired status
+      } else {
+        alert('Failed to hire applicant');
+      }
+    } catch (error) {
+      console.error('Error hiring applicant:', error);
+      alert('An error occurred while hiring the applicant');
+    }
+  };
+
   useEffect(() => {
     const storedRole = localStorage.getItem('userRole');
     if (storedRole) {
@@ -66,6 +90,11 @@ const Dashboard = () => {
     setShowJobForm(false);
     fetchJobs();
   };
+
+  if (role === 'Employee') {
+    // Render the Employee Dashboard if the role is Employee
+    return <EmployeeDashboard />;
+  }
 
   return (
     <motion.div
@@ -151,6 +180,9 @@ const Dashboard = () => {
                 <p>Posted by: {job.employer}</p>
                 <p>Transaction Hash: {job.transaction_hash}</p>
                 <p className="font-semibold mt-4">Applications: {job.application_count}</p>
+                <p className="mt-4 font-semibold">
+                  {job.is_filled ? 'Employee Hired' : 'No Employee Hired Yet'}
+                </p>
               </motion.div>
             ))
           ) : (
@@ -174,12 +206,23 @@ const Dashboard = () => {
                 transition={{ duration: 0.3 }}
               >
                 <h2 className="text-xl font-bold">{application.job_title}</h2>
-                <p>Applicant: {application.employee_wallet_address}</p>
-                <p>Cover Letter: {application.cover_letter}</p>
-                {application.resume_link && (
+                <p>Applicant: {application.applicant}</p>
+                <p>Cover Letter: {application.cover_letter || 'No cover letter provided'}</p>
+                {application.resume_id && (
                   <p>
-                    Resume: <a href={application.resume_link} target="_blank" rel="noopener noreferrer" className="text-blue-500">View Resume</a>
+                    Resume ID: {application.resume_id}
                   </p>
+                )}
+                {!application.hired && (
+                  <button
+                    className="bg-green-500 text-white font-bold py-2 px-4 rounded-lg mt-4 hover:bg-green-700"
+                    onClick={() => handleHire(application.job_id, application.applicant)}
+                  >
+                    {application.hired ? 'Hired' : 'Hire'}
+                  </button>
+                )}
+                {application.hired && (
+                  <p className="text-green-600 font-bold mt-4">This applicant has been hired</p>
                 )}
               </motion.div>
             ))

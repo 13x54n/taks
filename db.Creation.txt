@@ -40,3 +40,13 @@ CREATE TABLE Roles (
     role VARCHAR(50) NOT NULL, -- Role name (e.g., admin, employer, employee)
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Timestamp of when the role was assigned
 );
+
+
+-- To implement the hired functionality
+-- Update the Applications table to add a 'hired' column
+ALTER TABLE Applications
+ADD COLUMN hired BOOLEAN DEFAULT FALSE; -- Boolean to indicate if the applicant has been hired
+
+-- Update the Jobs table to ensure it can store the employee who was hired
+ALTER TABLE Jobs
+ALTER COLUMN employee SET NOT NULL; -- Make sure the employee field is NOT NULL after hiring
