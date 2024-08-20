@@ -3,7 +3,7 @@ import DaoABI from "../utils/DaoABI.json"; // Replace with the correct path to y
 import { publicClient, walletClient } from "@/utils/ViemConfig";
 
 // Use the provided DAO contract address
-const DAO_CONTRACT_ADDRESS = "0xfe5e240e7217e0665aa659b5fbc607501485272c";
+const DAO_CONTRACT_ADDRESS = "0x7125a29ef86aE9698936B5AF741F8e37FD0dd304";
 
 // Function to get job data
 export const getJobData = async (jobId: string) => {
