@@ -79,12 +79,10 @@ router.post("/hire-applicant", async (req, res) => {
         jobId,
       ]);
 
-      res
-        .status(200)
-        .json({
-          message: "Applicant hired successfully",
-          application: updateApplication.rows[0],
-        });
+      res.status(200).json({
+        message: "Applicant hired successfully",
+        application: updateApplication.rows[0],
+      });
     } else {
       res.status(500).json({ error: "Failed to hire applicant" });
     }
@@ -182,6 +180,35 @@ router.post("/request-flash-loan", async (req, res) => {
     res.status(201).json({ message: "Flash loan requested successfully." });
   } catch (error) {
     console.error("Error requesting flash loan:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// endpoint for getting flash-loan-data
+
+router.get("/flash-loan-data", async (req, res) => {
+  try {
+    const result = await pool.query(`
+          SELECT
+              job_id AS _id,
+              title,
+              payment AS "totalAmount",
+              (payment * 0.5) AS "flashLoanAmount",
+              is_filled,
+              employer AS "employee",
+              employee AS "assignedTo"
+          FROM Jobs
+          WHERE eligible_for_flash_loans = TRUE
+      `);
+
+    const data = result.rows.map((job) => ({
+      ...job,
+      isLoanTaken: job.is_filled, // Assuming 'is_filled' indicates whether the loan is taken
+    }));
+
+    res.json(data);
+  } catch (error) {
+    console.error("Error fetching flash loan data:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
