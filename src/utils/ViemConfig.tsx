@@ -12,8 +12,6 @@ export const address: any =
     method: "eth_requestAccounts",
   }));
 
-console.log(address);
-
 // eg: Metamask
 export const walletClient = createWalletClient({
   account: address[0],

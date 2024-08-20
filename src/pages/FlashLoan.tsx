@@ -20,7 +20,6 @@ interface JobProps {
 }
 
 const JobTableCell: React.FC<JobProps> = ({ job }) => {
-  console.log(job)
   if (job)
     return (
       <td className="px-6 py-4">
@@ -30,7 +29,9 @@ const JobTableCell: React.FC<JobProps> = ({ job }) => {
         {" ➡️ "}
         {job?.assignedTo && job?.assignedTo.slice(0, 5)}
         {job?.assignedTo && job?.assignedTo.length > 5 && "..."}
-        {job?.assignedTo && job?.assignedTo.length > 5 && job?.assignedTo.slice(-5)}
+        {job?.assignedTo &&
+          job?.assignedTo.length > 5 &&
+          job?.assignedTo.slice(-5)}
       </td>
     );
 };
@@ -79,8 +80,12 @@ export default function FlashLoan() {
   }, []);
 
   const handleRequestLoan = async (jobId: string) => {
-    await getLoan(jobId);
-    console.log(`Requesting loan for job ${jobId}`);
+    try {
+      await getLoan(jobId);
+      console.log(`Requesting loan for job ${jobId}`);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
