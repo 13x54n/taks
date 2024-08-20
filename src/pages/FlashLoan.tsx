@@ -20,17 +20,20 @@ interface JobProps {
 }
 
 const JobTableCell: React.FC<JobProps> = ({ job }) => {
-  return (
-    <td className="px-6 py-4">
-      {job.employee.slice(0, 5)}
-      {job.employee.length > 5 && '...'}
-      {job.employee.length > 5 && job.employee.slice(-5)}
-      {" ➡️ "}
-      {job.assignedTo.slice(0, 5)}
-      {job.assignedTo.length > 5 && '...'}
-      {job.assignedTo.length > 5 && job.assignedTo.slice(-5)}
-    </td>
-  );
+  if (job)
+    return (
+      <td className="px-6 py-4">
+        {job?.employee.slice(0, 5)}
+        {job?.employee.length > 5 && "..."}
+        {job?.employee.length > 5 && job?.employee.slice(-5)}
+        {" ➡️ "}
+        {job?.assignedTo && job?.assignedTo.slice(0, 5)}
+        {job?.assignedTo && job?.assignedTo.length > 5 && "..."}
+        {job?.assignedTo &&
+          job?.assignedTo.length > 5 &&
+          job?.assignedTo.slice(-5)}
+      </td>
+    );
 };
 
 const FuelLevelGauge: React.FC<FuelLevelGaugeProps> = ({ value }) => {
@@ -63,7 +66,9 @@ export default function FlashLoan() {
   useEffect(() => {
     const fetchFlashEnabledJobs = async () => {
       try {
-        const response = await fetch("http://localhost:3001/api/flash-loan-data");
+        const response = await fetch(
+          "http://localhost:3001/api/flash-loan-data"
+        );
         const data = await response.json();
         setFlashEnabledJobs(data);
       } catch (error) {
@@ -75,8 +80,12 @@ export default function FlashLoan() {
   }, []);
 
   const handleRequestLoan = async (jobId: string) => {
-    await getLoan(jobId)
-    console.log(`Requesting loan for job ${jobId}`);
+    try {
+      await getLoan(jobId);
+      console.log(`Requesting loan for job ${jobId}`);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -141,12 +150,26 @@ export default function FlashLoan() {
                     {job.title}
                   </th>
                   <td className="px-6 py-4">
-                    {ethers.formatUnits(BigInt(Math.floor(job.flashLoanAmount)), 18)}/
-                    {ethers.formatUnits(BigInt(Math.floor(job.totalAmount)), 18)} ETH
+                    {ethers.formatUnits(
+                      BigInt(Math.floor(job.flashLoanAmount)),
+                      18
+                    )}
+                    /
+                    {ethers.formatUnits(
+                      BigInt(Math.floor(job.totalAmount)),
+                      18
+                    )}{" "}
+                    ETH
                   </td>
                   <JobTableCell job={job} />
                   <td className="px-6 py-4">
-                    <div className={job.isLoanTaken ? "bg-[red] text-[white] text-center" : "bg-[green] text-[white] text-center"}>
+                    <div
+                      className={
+                        job.isLoanTaken
+                          ? "bg-[red] text-[white] text-center"
+                          : "bg-[green] text-[white] text-center"
+                      }
+                    >
                       {job.isLoanTaken ? "Unavailable" : "Available"}
                     </div>
                   </td>
