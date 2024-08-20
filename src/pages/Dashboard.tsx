@@ -7,6 +7,18 @@ import { motion } from 'framer-motion';
 import JobCreationForm from '@/components/JobCreationForm';
 import EmployeeDashboard from './EmployeeDashboard';
 
+interface Application {
+  application_id: string;
+  job_id: string;
+  applicant: string;
+  resume_id: string;
+  timestamp: number;
+  cover_letter: string | null;
+  hired: boolean;
+  job_title: string;
+}
+
+
 
 ChartJS.register(ArcElement, Tooltip, Legend, Title);
 
@@ -16,7 +28,7 @@ const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('Jobs');
   const [showJobForm, setShowJobForm] = useState(false);
   const [jobs, setJobs] = useState([]);
-  const [applications, setApplications] = useState([]);
+  const [applications, setApplications] = useState<Application[]>([]);
   const [loadingJobs, setLoadingJobs] = useState(true);
   const [loadingApplications, setLoadingApplications] = useState(true);
 
@@ -48,7 +60,7 @@ const Dashboard = () => {
     }
   };
 
-  const handleHire = async (jobId, applicant) => {
+  const handleHire = async (jobId: string, applicant: string) => {
     try {
       const response = await fetch(`http://localhost:3001/api/hire-applicant`, {
         method: 'POST',
@@ -57,10 +69,19 @@ const Dashboard = () => {
         },
         body: JSON.stringify({ jobId, applicant }),
       });
-
+  
       if (response.ok) {
+        const updatedApplication = await response.json();
         alert('Applicant hired successfully');
-        fetchJobs(); // Refresh job data to reflect the hired status
+  
+        // Update the applications state to reflect the hired status
+        setApplications((prevApplications) =>
+          prevApplications.map((application) =>
+            application.application_id === updatedApplication.application.application_id
+              ? { ...application, hired: true }
+              : application
+          )
+        );
       } else {
         alert('Failed to hire applicant');
       }
@@ -69,6 +90,7 @@ const Dashboard = () => {
       alert('An error occurred while hiring the applicant');
     }
   };
+  
 
   useEffect(() => {
     const storedRole = localStorage.getItem('userRole');
@@ -180,9 +202,9 @@ const Dashboard = () => {
                 <p>Posted by: {job.employer}</p>
                 <p>Transaction Hash: {job.transaction_hash}</p>
                 <p className="font-semibold mt-4">Applications: {job.application_count}</p>
-                <p className="mt-4 font-semibold">
+                {/* <p className="mt-4 font-semibold">
                   {job.is_filled ? 'Employee Hired' : 'No Employee Hired Yet'}
-                </p>
+                </p> */}
               </motion.div>
             ))
           ) : (

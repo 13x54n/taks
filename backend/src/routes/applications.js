@@ -55,7 +55,8 @@ router.post("/apply-job", async (req, res) => {
 });
 
 // Mark an applicant as hired
-// Endpoint to hire an applicant
+// Update the hire-applicant route in your application.js
+
 router.post("/hire-applicant", async (req, res) => {
   const { jobId, applicant } = req.body;
 
@@ -66,16 +67,24 @@ router.post("/hire-applicant", async (req, res) => {
   }
 
   try {
-    // Update the job to mark it as filled and set the employee
-    const result = await pool.query(
-      "UPDATE Jobs SET is_filled = TRUE, employee = $1 WHERE job_id = $2 RETURNING *",
-      [applicant, jobId]
+    // Update the application to mark the applicant as hired
+    const updateApplication = await pool.query(
+      "UPDATE Applications SET hired = TRUE WHERE job_id = $1 AND applicant = $2 RETURNING *",
+      [jobId, applicant]
     );
 
-    if (result.rows.length > 0) {
+    if (updateApplication.rows.length > 0) {
+      // Update the job to mark it as filled
+      await pool.query("UPDATE Jobs SET is_filled = TRUE WHERE job_id = $1", [
+        jobId,
+      ]);
+
       res
         .status(200)
-        .json({ message: "Applicant hired successfully", job: result.rows[0] });
+        .json({
+          message: "Applicant hired successfully",
+          application: updateApplication.rows[0],
+        });
     } else {
       res.status(500).json({ error: "Failed to hire applicant" });
     }
@@ -84,6 +93,36 @@ router.post("/hire-applicant", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+// Endpoint to hire an applicant
+// router.post("/hire-applicant", async (req, res) => {
+//   const { jobId, applicant } = req.body;
+
+//   if (!jobId || !applicant) {
+//     return res
+//       .status(400)
+//       .json({ error: "Invalid jobId or applicant address" });
+//   }
+
+//   try {
+//     // Update the job to mark it as filled and set the employee
+//     const result = await pool.query(
+//       "UPDATE Jobs SET is_filled = TRUE, employee = $1 WHERE job_id = $2 RETURNING *",
+//       [applicant, jobId]
+//     );
+
+//     if (result.rows.length > 0) {
+//       res
+//         .status(200)
+//         .json({ message: "Applicant hired successfully", job: result.rows[0] });
+//     } else {
+//       res.status(500).json({ error: "Failed to hire applicant" });
+//     }
+//   } catch (error) {
+//     console.error("Error hiring applicant:", error);
+//     res.status(500).json({ error: "Internal Server Error" });
+//   }
+// });
 
 // Check if a specific employee has already applied for a specific job
 router.get("/has-applied/:jobId/:applicant", async (req, res) => {
