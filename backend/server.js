@@ -4,12 +4,13 @@ import multer from "multer";
 import crypto from "crypto";
 import pkg from "pg";
 import cors from "cors";
-app.use(cors());
 
 const { Pool } = pkg;
 
 const app = express();
 const port = 3001;
+
+app.use(cors());
 
 const pool = new Pool({
   user: "everest",
