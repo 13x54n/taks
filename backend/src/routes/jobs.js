@@ -1,7 +1,41 @@
 import { Router } from "express";
 import pool from "../db.js";
+import { v4 as uuidv4 } from "uuid";
 
 const router = Router();
+
+// Create a new job
+router.post("/create-job", async (req, res) => {
+  const { title, description, payment, expiry_time, employer } = req.body;
+  const job_id = uuidv4(); // Generate UUID for job ID
+  const timestamp = Math.floor(Date.now() / 1000); // Current timestamp in seconds
+
+  // Transaction hash can be generated using a simple random string or specific logic
+  const transaction_hash = uuidv4(); // Using UUID as a placeholder for transaction hash
+
+  try {
+    const result = await pool.query(
+      `INSERT INTO Jobs (job_id, title, description, employer, payment, timestamp, expiry_time, transaction_hash) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8) 
+       RETURNING *`,
+      [
+        job_id,
+        title,
+        description,
+        employer,
+        payment,
+        timestamp,
+        expiry_time,
+        transaction_hash,
+      ]
+    );
+
+    res.status(201).json(result.rows[0]); // Return the created job
+  } catch (error) {
+    console.error("Error creating job:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
 
 // Get all jobs
 router.get("/jobs", async (req, res) => {

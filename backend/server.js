@@ -2,7 +2,6 @@ import express from "express";
 import multer from "multer";
 import crypto from "crypto";
 import pkg from "pg";
-import fs from "fs";
 
 const { Pool } = pkg;
 

@@ -10,17 +10,17 @@ const RewardCard: React.FC = () => {
         </div>
         <div className="ml-4">
           <div className="text-md font-semibold text-gray-100">Coherence</div>
-          <div className="text-4xl font-bold">Rewards</div>
+          <div className="text-2xl font-bold">Rewards</div>
         </div>
       </div>
       <div className="flex space-x-8">
         <div className="text-center">
           <div className="text-md font-semibold text-gray-100">Total</div>
-          <div className="text-4xl font-bold">0.000 ETH</div>
+          <div className="text-2xl font-bold">0.000 ETH</div>
         </div>
         <div className="text-center">
           <div className="text-md font-semibold text-gray-100">Total</div>
-          <div className="text-4xl font-bold">0 PNK</div>
+          <div className="text-2xl font-bold">0 PNK</div>
         </div>
       </div>
     </div>

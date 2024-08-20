@@ -44,11 +44,11 @@ const FuelLevelGauge: React.FC<FuelLevelGaugeProps> = ({ value }) => {
 
 export default function FlashLoan() {
   const handleRequestLoan = async () => {
-    const data = await getLoan("project");
+    const data = await getJobData("project");
     console.log(data)
   }
   return (
-    <div className="container max-w-7xl mx-auto flex">
+    <div className="container max-w-7xl mx-auto flex mt-8">
       <div className="text-sm flex flex-col items-center min-w-[22vw]">
         <h1 className="text-lg mb-3 font-medium">Credit Report</h1>
         <FuelLevelGauge value={20} />

@@ -8,9 +8,6 @@ export const content = [
 ];
 export const prefix = "";
 export const theme = {
-  // colors: {
-  //   primary: "#7DD956",
-  // },
   container: {
     center: true,
     padding: "2rem",
