@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useWallet } from '@/context/WalletContext';
+import { applyForJob } from '@/api/daoInteractions';
 
 interface JobApplicationFormProps {
   jobId: string;
@@ -17,6 +18,8 @@ const JobApplicationForm: React.FC<JobApplicationFormProps> = ({ jobId, onApplic
     setIsSubmitting(true);
 
     try {
+      await applyForJob(jobId, coverLetter, resumeId);
+
       const response = await fetch('http://localhost:3001/api/apply-job', {
         method: 'POST',
         headers: {
@@ -26,8 +29,8 @@ const JobApplicationForm: React.FC<JobApplicationFormProps> = ({ jobId, onApplic
           jobId,
           applicant: walletAddress,
           resumeId,
-          coverLetter: coverLetter || null, // Include cover letter if provided, otherwise send null
-          timestamp: Math.floor(Date.now() / 1000), // Example timestamp
+          coverLetter: coverLetter || null, 
+          timestamp: Math.floor(Date.now() / 1000), 
         }),
       });
 

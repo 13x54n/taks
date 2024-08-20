@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useWallet } from '../context/WalletContext';
 import { useRole } from '../context/RoleContext';
+import { raiseDispute } from '@/api/daoInteractions';
 
 const EmployeeDashboard = () => {
   const { walletAddress } = useWallet();
@@ -9,6 +10,11 @@ const EmployeeDashboard = () => {
   const [appliedJobs, setAppliedJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [flashLoanRequests, setFlashLoanRequests] = useState([]);
+  const [showDisputeModal, setShowDisputeModal] = useState(false);
+  const [selectedJob, setSelectedJob] = useState(null);
+  const [disputeDescription, setDisputeDescription] = useState('');
+  const [transactionHash, setTransactionHash] = useState('');
+  const [showTooltip, setShowTooltip] = useState(false);
 
   // Fetch jobs the employee has applied for
   const fetchAppliedJobs = async () => {
@@ -44,6 +50,35 @@ const EmployeeDashboard = () => {
     } catch (error) {
       console.error('Error requesting flash loan:', error);
       alert('An error occurred while requesting the flash loan');
+    }
+  };
+
+  const handleRaiseDispute = (job) => {
+    setSelectedJob(job);
+    setTransactionHash(''); // Reset the transaction hash field when opening the modal
+    setShowDisputeModal(true);
+  };
+
+  const handleDisputeSubmit = async () => {
+    if (!disputeDescription) {
+      alert("Please enter a description for the dispute.");
+      return;
+    }
+  
+    const employerAddress = selectedJob?.employer;
+    const isAgainstEmployer = true; 
+  
+    try {
+      const transaction_hash = await raiseDispute(disputeDescription, employerAddress, isAgainstEmployer);
+      setTransactionHash(transaction_hash); // Update the transaction hash with the actual value
+      alert('Dispute raised successfully');
+
+      // Show tooltip for 3 seconds
+      setShowTooltip(true);
+      setTimeout(() => setShowTooltip(false), 3000);
+    } catch (error) {
+      console.error('Error raising dispute:', error);
+      alert('An error occurred while raising the dispute');
     }
   };
 
@@ -90,12 +125,77 @@ const EmployeeDashboard = () => {
                   {flashLoanRequests.includes(job.job_id) ? 'Flash Loan Requested' : 'Request Flash Loan'}
                 </button>
               )}
+              {job.is_hired && (
+                <button
+                  className="ml-8 bg-red-500 text-white font-bold py-2 px-4 rounded-lg mt-4 hover:bg-red-700"
+                  onClick={() => handleRaiseDispute(job)}
+                >
+                  Raise Dispute
+                </button>
+              )}
             </motion.div>
           ))
         ) : (
           <div>No jobs applied for</div>
         )}
       </div>
+
+      {/* Dispute Modal */}
+      {showDisputeModal && (
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-1/3 relative">
+            <button
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+              onClick={() => setShowDisputeModal(false)}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <h2 className="text-xl font-bold mb-4">Raise Dispute</h2>
+            <p><strong>Employer Address:</strong> {selectedJob?.employer}</p>
+            <div className="mt-4">
+              <label className="block text-sm font-bold mb-2">Description</label>
+              <textarea
+                value={disputeDescription}
+                onChange={(e) => setDisputeDescription(e.target.value)}
+                required
+                className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div className="mt-4">
+              <label className="block text-sm font-bold mb-2">Transaction Hash</label>
+              <input
+                type="text"
+                value={transactionHash}
+                readOnly
+                className="w-full p-3 border rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div className="flex justify-end mt-4 space-x-4">
+              <button
+                className="bg-gray-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-700"
+                onClick={() => setShowDisputeModal(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700"
+                onClick={handleDisputeSubmit}
+              >
+                Submit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Tooltip Notification */}
+      {showTooltip && (
+        <div className="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-md shadow-md animate-bounce">
+          Transaction completed in the Chain
+        </div>
+      )}
     </motion.div>
   );
 };
