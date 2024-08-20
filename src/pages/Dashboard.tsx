@@ -18,8 +18,6 @@ interface Application {
   job_title: string;
 }
 
-
-
 ChartJS.register(ArcElement, Tooltip, Legend, Title);
 
 const Dashboard = () => {
@@ -31,6 +29,7 @@ const Dashboard = () => {
   const [applications, setApplications] = useState<Application[]>([]);
   const [loadingJobs, setLoadingJobs] = useState(true);
   const [loadingApplications, setLoadingApplications] = useState(true);
+  const [showToast, setShowToast] = useState(false); // State to manage toast visibility
 
   // Fetch jobs for the employer
   const fetchJobs = async () => {
@@ -90,7 +89,6 @@ const Dashboard = () => {
       alert('An error occurred while hiring the applicant');
     }
   };
-  
 
   useEffect(() => {
     const storedRole = localStorage.getItem('userRole');
@@ -111,6 +109,9 @@ const Dashboard = () => {
   const handleJobCreated = () => {
     setShowJobForm(false);
     fetchJobs();
+    // Show toast notification
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000); // Hide the toast after 3 seconds
   };
 
   if (role === 'Employee') {
@@ -272,6 +273,13 @@ const Dashboard = () => {
           />
         </div>
       </div>
+
+      {/* Toast Notification */}
+      {showToast && (
+        <div className="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-md shadow-md animate-bounce">
+          Transaction completed in the Chain
+        </div>
+      )}
     </motion.div>
   );
 };
