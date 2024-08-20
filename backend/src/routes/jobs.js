@@ -16,6 +16,7 @@ router.post("/create-job", async (req, res) => {
   } = req.body; // Get transaction_hash from the request body
   const job_id = uuidv4(); // Generate UUID for job ID
   const timestamp = Math.floor(Date.now() / 1000); // Current timestamp in seconds
+  console.log(transaction_hash);
 
   if (!transaction_hash) {
     return res.status(400).json({ error: "Transaction hash is required" });

@@ -14,6 +14,7 @@ const JobCreationForm = ({ onJobCreated }) => {
   const [eligibleForFlashLoans, setEligibleForFlashLoans] = useState(false);
   const [transactionHash, setTransactionHash] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showToast, setShowToast] = useState(false); // State to manage toast visibility
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -45,6 +46,10 @@ const JobCreationForm = ({ onJobCreated }) => {
       if (response.ok) {
         alert('Job created successfully');
         onJobCreated(); // Close the form after job creation
+        
+        // Show toast notification
+        setShowToast(true);
+        setTimeout(() => setShowToast(false), 3000); // Hide the toast after 3 seconds
       } else {
         alert('Failed to create job');
       }
@@ -129,6 +134,13 @@ const JobCreationForm = ({ onJobCreated }) => {
       >
         {loading ? 'Creating...' : 'Create Job'}
       </motion.button>
+
+      {/* Toast Notification */}
+      {showToast && (
+        <div className="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-md shadow-md animate-bounce">
+          Transaction completed in the Chain
+        </div>
+      )}
     </motion.form>
   );
 };
