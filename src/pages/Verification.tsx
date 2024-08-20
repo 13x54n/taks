@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useWallet } from '@/context/WalletContext';
 
 export default function Verification() {
+  const { walletAddress } = useWallet(); // Get wallet address from context
   const [isRecording, setIsRecording] = useState(false);
   const [isPreview, setIsPreview] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
@@ -38,13 +40,22 @@ export default function Verification() {
   const handleStartRecording = () => {
     setIsPreview(false);
     setRecordedChunks([]);
+    
     fetch('http://localhost:3001/api/questions')
-      .then(response => response.json())
+      .then(response => {
+        if (!response.ok) {
+          return response.text().then(text => {
+            throw new Error(`Server error: ${text}`);
+          });
+        }
+        return response.json();
+      })
       .then(data => {
+        console.log(`questions: ${JSON.stringify(data)}`);
         setShuffledQuestions(data);
+        setIsRecording(true);
       })
       .catch(error => console.error('Error fetching questions:', error));
-    setIsRecording(true);
   };
 
   const handleStopRecording = () => {
@@ -54,24 +65,34 @@ export default function Verification() {
 
   const handleSaveRecording = () => {
     if (recordedChunks.length) {
-      const blob = new Blob(recordedChunks, {
-        type: 'video/webm'
-      });
+      const blob = new Blob(recordedChunks, { type: 'video/webm' });
       const formData = new FormData();
+  
+      // Use walletAddress as user_id
+      const role = "Judiciary"; // Replace with actual role
+  
       formData.append('video', blob, 'verification_video.webm');
+      formData.append('user_id', walletAddress);
+      formData.append('role', role);
       formData.append('questions', JSON.stringify(shuffledQuestions));
-
+  
       fetch('http://localhost:3001/api/upload', {
         method: 'POST',
         body: formData
       })
-        .then(response => response.text())
-        .then(data => {
-          console.log(data);
-        })
-        .catch(error => {
-          console.error('Error uploading video:', error);
-        });
+      .then(response => response.json())
+      .then(data => {
+        console.log(data);
+        if (data.message === "Video uploaded and hash saved with questions") {
+          alert("Verification video uploaded successfully");
+        } else {
+          alert("Failed to upload video");
+        }
+      })
+      .catch(error => {
+        console.error('Error uploading video:', error);
+        alert("An error occurred while uploading the video");
+      });
     }
   };
 
@@ -139,7 +160,6 @@ export default function Verification() {
                 Download Recording
               </button>
             </div>
-
           )}
         </div>
         <div className="flex-1">

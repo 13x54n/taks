@@ -12,6 +12,7 @@ const JobCreationForm = ({ onJobCreated }) => {
   const [eligibleForFlashLoans, setEligibleForFlashLoans] = useState(false);
   const [transactionHash, setTransactionHash] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showToast, setShowToast] = useState(false); // State to manage toast visibility
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -39,6 +40,10 @@ const JobCreationForm = ({ onJobCreated }) => {
         const data = await response.json();
         alert('Job created successfully');
         onJobCreated(); // Close the form after job creation
+        
+        // Show toast notification
+        setShowToast(true);
+        setTimeout(() => setShowToast(false), 3000); // Hide the toast after 3 seconds
       } else {
         alert('Failed to create job');
       }
@@ -51,80 +56,89 @@ const JobCreationForm = ({ onJobCreated }) => {
   };
 
   return (
-    <motion.form 
-      onSubmit={handleSubmit} 
-      className="space-y-6 p-6 bg-white rounded-lg shadow-md"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-    >
-      <div>
-        <label className="block text-sm font-bold mb-2">Job Title</label>
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          required
-          className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
-      <div>
-        <label className="block text-sm font-bold mb-2">Description</label>
-        <textarea
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          required
-          className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
-      <div>
-        <label className="block text-sm font-bold mb-2">Payment (in Wei)</label>
-        <input
-          type="number"
-          value={payment}
-          onChange={(e) => setPayment(e.target.value)}
-          required
-          className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
-      <div>
-        <label className="block text-sm font-bold mb-2">Expiry Time (timestamp)</label>
-        <input
-          type="number"
-          value={expiryTime}
-          onChange={(e) => setExpiryTime(e.target.value)}
-          required
-          className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
-      <div className="flex items-center space-x-4">
-        <label className="block text-sm font-bold mb-2">Eligible for Flash Loans</label>
-        <input
-          type="checkbox"
-          checked={eligibleForFlashLoans}
-          onChange={(e) => setEligibleForFlashLoans(e.target.checked)}
-          className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-        />
-      </div>
-      <div>
-        <label className="block text-sm font-bold mb-2">Transaction Hash</label>
-        <input
-          type="text"
-          value={transactionHash}
-          onChange={(e) => setTransactionHash(e.target.value)}
-          required
-          className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
-      <motion.button
-        type="submit"
-        disabled={loading}
-        className="bg-gradient-to-r from-blue-500 to-green-500 text-white font-bold py-3 px-6 rounded-lg hover:from-green-500 hover:to-blue-500 transition-all duration-200"
-        whileHover={{ scale: 1.05 }}
+    <motion.div>
+      <motion.form 
+        onSubmit={handleSubmit} 
+        className="space-y-6 p-6 bg-white rounded-lg shadow-md"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
       >
-        {loading ? 'Creating...' : 'Create Job'}
-      </motion.button>
-    </motion.form>
+        <div>
+          <label className="block text-sm font-bold mb-2">Job Title</label>
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-bold mb-2">Description</label>
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            required
+            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-bold mb-2">Payment (in Wei)</label>
+          <input
+            type="number"
+            value={payment}
+            onChange={(e) => setPayment(e.target.value)}
+            required
+            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-bold mb-2">Expiry Time (timestamp)</label>
+          <input
+            type="number"
+            value={expiryTime}
+            onChange={(e) => setExpiryTime(e.target.value)}
+            required
+            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+        <div className="flex items-center space-x-4">
+          <label className="block text-sm font-bold mb-2">Eligible for Flash Loans</label>
+          <input
+            type="checkbox"
+            checked={eligibleForFlashLoans}
+            onChange={(e) => setEligibleForFlashLoans(e.target.checked)}
+            className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-bold mb-2">Transaction Hash</label>
+          <input
+            type="text"
+            value={transactionHash}
+            onChange={(e) => setTransactionHash(e.target.value)}
+            required
+            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+        <motion.button
+          type="submit"
+          disabled={loading}
+          className="bg-gradient-to-r from-blue-500 to-green-500 text-white font-bold py-3 px-6 rounded-lg hover:from-green-500 hover:to-blue-500 transition-all duration-200"
+          whileHover={{ scale: 1.05 }}
+        >
+          {loading ? 'Creating...' : 'Create Job'}
+        </motion.button>
+      </motion.form>
+
+      {/* Toast Notification */}
+      {showToast && (
+        <div className="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-md shadow-md animate-bounce">
+          Transaction completed in the Chain
+        </div>
+      )}
+    </motion.div>
   );
 };
 

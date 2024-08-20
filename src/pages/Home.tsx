@@ -13,7 +13,6 @@ export default function Home() {
       try {
         const response = await fetch("http://localhost:3001/api/jobs");
         const data = await response.json();
-        console.log(data);
         if (Array.isArray(data)) {
           setJobs(data);
         } else {
@@ -62,14 +61,14 @@ export default function Home() {
               ) : jobs.length > 0 ? (
                 jobs.map((job) => (
                   <TaksCard
-                    key={job.id}
-                    jobId={job.id} // Make sure `job.id` is defined
+                    key={job.job_id}
+                    jobId={job.job_id} // Use the correct field from your job data
                     title={job.title}
                     description={job.description}
                     creator={job.employer}
                     proposals="Less than 5"
-                    timePosted={job.created_at}
-                    tokenStake={job.salary}
+                    timePosted={job.timestamp}
+                    tokenStake={job.payment}
                     transactionHash={job.transaction_hash}
                   />
                 ))

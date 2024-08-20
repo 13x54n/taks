@@ -1,7 +1,10 @@
+/* eslint-disable no-undef */
 import express from "express";
 import multer from "multer";
 import crypto from "crypto";
 import pkg from "pg";
+import cors from "cors";
+app.use(cors());
 
 const { Pool } = pkg;
 
@@ -16,21 +19,33 @@ const pool = new Pool({
   port: 5432,
 });
 
+pool.on("error", (err) => {
+  console.error("Unexpected error on idle client", err);
+  process.exit(-1);
+});
+
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 // Endpoint to get random questions
-app.get("/questions", async (req, res) => {
+app.get("/api/questions", async (req, res) => {
   try {
+    console.log("res:", res); // Check what res is
     const result = await pool.query(
-      "SELECT question FROM questions ORDER BY RANDOM() LIMIT 10"
+      "SELECT question FROM questions ORDER BY RANDOM() LIMIT 5"
     );
     const questions = result.rows.map((row) => row.question);
     res.json(questions);
   } catch (error) {
     console.error("Error fetching questions from database:", error);
-    res.status(500).send("Internal Server Error");
+    res.status(500).json({ error: error.message || "Internal Server Error" });
   }
+});
+
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: "Something went wrong!" });
 });
 
 // Endpoint to upload video and save hash
@@ -56,5 +71,5 @@ app.post("/upload", upload.single("video"), async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+  console.log(`Server running on portssss ${port}`);
 });

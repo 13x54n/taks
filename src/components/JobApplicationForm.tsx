@@ -8,7 +8,7 @@ interface JobApplicationFormProps {
 
 const JobApplicationForm: React.FC<JobApplicationFormProps> = ({ jobId, onApplicationSubmitted }) => {
   const [coverLetter, setCoverLetter] = useState('');
-  const [bidAmount, setBidAmount] = useState('');
+  const [resumeId, setResumeId] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { walletAddress } = useWallet();
 
@@ -24,9 +24,10 @@ const JobApplicationForm: React.FC<JobApplicationFormProps> = ({ jobId, onApplic
         },
         body: JSON.stringify({
           jobId,
-          applicantAddress: walletAddress,
-          coverLetter,
-          bidAmount,
+          applicant: walletAddress,
+          resumeId,
+          coverLetter: coverLetter || null, // Include cover letter if provided, otherwise send null
+          timestamp: Math.floor(Date.now() / 1000), // Example timestamp
         }),
       });
 
@@ -35,11 +36,11 @@ const JobApplicationForm: React.FC<JobApplicationFormProps> = ({ jobId, onApplic
       } else {
         const errorData = await response.json();
         console.error('Application submission failed:', errorData);
-        // You might want to show an error message to the user here
+        // Show error message to the user
       }
     } catch (error) {
       console.error('Error submitting application:', error);
-      // You might want to show an error message to the user here
+      // Show error message to the user
     } finally {
       setIsSubmitting(false);
     }
@@ -48,8 +49,21 @@ const JobApplicationForm: React.FC<JobApplicationFormProps> = ({ jobId, onApplic
   return (
     <form onSubmit={handleSubmit} className="mt-4">
       <div className="mb-4">
+        <label htmlFor="resumeId" className="block text-sm font-medium text-gray-700">
+          Resume ID
+        </label>
+        <input
+          type="text"
+          id="resumeId"
+          value={resumeId}
+          onChange={(e) => setResumeId(e.target.value)}
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+          required
+        />
+      </div>
+      <div className="mb-4">
         <label htmlFor="coverLetter" className="block text-sm font-medium text-gray-700">
-          Cover Letter
+          Cover Letter (Optional)
         </label>
         <textarea
           id="coverLetter"
@@ -57,22 +71,6 @@ const JobApplicationForm: React.FC<JobApplicationFormProps> = ({ jobId, onApplic
           onChange={(e) => setCoverLetter(e.target.value)}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
           rows={4}
-          required
-        />
-      </div>
-      <div className="mb-4">
-        <label htmlFor="bidAmount" className="block text-sm font-medium text-gray-700">
-          Bid Amount (in ETH)
-        </label>
-        <input
-          type="number"
-          id="bidAmount"
-          value={bidAmount}
-          onChange={(e) => setBidAmount(e.target.value)}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-          required
-          step="0.01"
-          min="0"
         />
       </div>
       <button

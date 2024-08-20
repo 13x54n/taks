@@ -13,20 +13,33 @@ import CaseBarChart from "@/components/CaseBarChart";
 import { mockCasesData } from "../mock-data";
 import CasePieChart from "@/components/CasePieChart";
 import CaseItem from "@/components/CaseItem";
+import { Pie } from "react-chartjs-2";
+import EmployeeDashboard from "./EmployeeDashboard";
+
+interface Application {
+  application_id: string;
+  job_id: string;
+  applicant: string;
+  resume_id: string;
+  timestamp: number;
+  cover_letter: string | null;
+  hired: boolean;
+  job_title: string;
+}
 
 ChartJS.register(ArcElement, Tooltip, Legend, Title);
 
 const Dashboard = () => {
-  const { walletAddress, setWalletAddress } = useWallet();
-  console.log(walletAddress);
+  const { walletAddress } = useWallet();
   const { role, setRole } = useRole();
   console.log("role", role);
   const [activeTab, setActiveTab] = useState("Jobs");
   const [showJobForm, setShowJobForm] = useState(false);
   const [jobs, setJobs] = useState([]);
-  const [applications, setApplications] = useState([]);
+  const [applications, setApplications] = useState<Application[]>([]);
   const [loadingJobs, setLoadingJobs] = useState(true);
   const [loadingApplications, setLoadingApplications] = useState(true);
+  const [showToast, setShowToast] = useState(false); // State to manage toast visibility
 
   // Fetch jobs for the employer
   const fetchJobs = async () => {
@@ -60,6 +73,38 @@ const Dashboard = () => {
     }
   };
 
+  const handleHire = async (jobId: string, applicant: string) => {
+    try {
+      const response = await fetch(`http://localhost:3001/api/hire-applicant`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ jobId, applicant }),
+      });
+
+      if (response.ok) {
+        const updatedApplication = await response.json();
+        alert("Applicant hired successfully");
+
+        // Update the applications state to reflect the hired status
+        setApplications((prevApplications) =>
+          prevApplications.map((application) =>
+            application.application_id ===
+            updatedApplication.application.application_id
+              ? { ...application, hired: true }
+              : application
+          )
+        );
+      } else {
+        alert("Failed to hire applicant");
+      }
+    } catch (error) {
+      console.error("Error hiring applicant:", error);
+      alert("An error occurred while hiring the applicant");
+    }
+  };
+
   useEffect(() => {
     const storedRole = localStorage.getItem("userRole");
     if (storedRole) {
@@ -79,6 +124,9 @@ const Dashboard = () => {
   const handleJobCreated = () => {
     setShowJobForm(false);
     fetchJobs();
+    // Show toast notification
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000); // Hide the toast after 3 seconds
   };
 
   const handleLogout = () => {
@@ -87,6 +135,10 @@ const Dashboard = () => {
     localStorage.removeItem("walletAddress");
     localStorage.removeItem("userRole");
   };
+  if (role === "Employee") {
+    // Render the Employee Dashboard if the role is Employee
+    return <EmployeeDashboard />;
+  }
 
   // Calculate the counts for each status
   const statusCounts = mockCasesData.reduce(
@@ -108,7 +160,7 @@ const Dashboard = () => {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
-      <h1 className="text-4xl font-bold mb-8 text-gray-800">Dashboard</h1>
+      <h1 className="text-4xl font-bold mb-8 text-gray-800 mt-20">Dashboard</h1>
 
       {role === "Employer" && (
         <div className="mb-8">
@@ -140,14 +192,6 @@ const Dashboard = () => {
           )}
         </div>
       )}
-
-      <motion.button
-        onClick={handleLogout}
-        className="text-red-500 font-bold py-2 px-4 rounded-lg border border-red-500 hover:bg-red-500 hover:text-white transition duration-200"
-        whileHover={{ scale: 1.05 }}
-      >
-        Logout
-      </motion.button>
 
       {/* Tabs */}
       <div className="mb-8">
@@ -222,9 +266,12 @@ const Dashboard = () => {
                 transition={{ duration: 0.3 }}
               >
                 <h2 className="text-xl font-bold">{application.job_title}</h2>
-                <p>Applicant: {application.employee_wallet_address}</p>
-                <p>Cover Letter: {application.cover_letter}</p>
-                {application.resume_link && (
+                <p>Applicant: {application.applicant}</p>
+                <p>
+                  Cover Letter:{" "}
+                  {application.cover_letter || "No cover letter provided"}
+                </p>
+                {application.resume_id && (
                   <p>
                     Resume:{" "}
                     <a
@@ -235,6 +282,21 @@ const Dashboard = () => {
                     >
                       View Resume
                     </a>
+                  </p>
+                )}
+                {!application.hired && (
+                  <button
+                    className="bg-green-500 text-white font-bold py-2 px-4 rounded-lg mt-4 hover:bg-green-700"
+                    onClick={() =>
+                      handleHire(application.job_id, application.applicant)
+                    }
+                  >
+                    {application.hired ? "Hired" : "Hire"}
+                  </button>
+                )}
+                {application.hired && (
+                  <p className="text-green-600 font-bold mt-4">
+                    This applicant has been hired
                   </p>
                 )}
               </motion.div>
@@ -338,6 +400,13 @@ const Dashboard = () => {
           />
         </div> */}
       </div>
+
+      {/* Toast Notification */}
+      {showToast && (
+        <div className="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-md shadow-md animate-bounce">
+          Transaction completed in the Chain
+        </div>
+      )}
     </motion.div>
   );
 };

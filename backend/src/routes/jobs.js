@@ -6,12 +6,21 @@ const router = Router();
 
 // Create a new job
 router.post("/create-job", async (req, res) => {
-  const { title, description, payment, expiry_time, employer } = req.body;
+  const {
+    title,
+    description,
+    payment,
+    expiry_time,
+    employer,
+    transaction_hash,
+  } = req.body; // Get transaction_hash from the request body
   const job_id = uuidv4(); // Generate UUID for job ID
   const timestamp = Math.floor(Date.now() / 1000); // Current timestamp in seconds
+  console.log(transaction_hash);
 
-  // Transaction hash can be generated using a simple random string or specific logic
-  const transaction_hash = uuidv4(); // Using UUID as a placeholder for transaction hash
+  if (!transaction_hash) {
+    return res.status(400).json({ error: "Transaction hash is required" });
+  }
 
   try {
     const result = await pool.query(
@@ -26,7 +35,7 @@ router.post("/create-job", async (req, res) => {
         payment,
         timestamp,
         expiry_time,
-        transaction_hash,
+        transaction_hash, // Use the transaction_hash from the request body
       ]
     );
 
