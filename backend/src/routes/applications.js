@@ -203,7 +203,7 @@ router.get("/flash-loan-data", async (req, res) => {
 
     const data = result.rows.map((job) => ({
       ...job,
-      isLoanTaken: job.is_filled, // Assuming 'is_filled' indicates whether the loan is taken
+      isLoanTaken: job.is_filled,
     }));
 
     res.json(data);

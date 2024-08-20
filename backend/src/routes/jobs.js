@@ -1,6 +1,5 @@
 import { Router } from "express";
 import pool from "../db.js";
-import { v4 as uuidv4 } from "uuid";
 
 const router = Router();
 
@@ -13,10 +12,11 @@ router.post("/create-job", async (req, res) => {
     expiry_time,
     employer,
     transaction_hash,
-  } = req.body; // Get transaction_hash from the request body
-  const job_id = uuidv4(); // Generate UUID for job ID
-  const timestamp = Math.floor(Date.now() / 1000); // Current timestamp in seconds
-  console.log(transaction_hash);
+    job_id,
+    eligible_for_flash_loans,
+  } = req.body;
+
+  const timestamp = Math.floor(Date.now() / 1000);
 
   if (!transaction_hash) {
     return res.status(400).json({ error: "Transaction hash is required" });
@@ -24,8 +24,8 @@ router.post("/create-job", async (req, res) => {
 
   try {
     const result = await pool.query(
-      `INSERT INTO Jobs (job_id, title, description, employer, payment, timestamp, expiry_time, transaction_hash) 
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8) 
+      `INSERT INTO Jobs (job_id, title, description, employer, payment, timestamp, expiry_time, transaction_hash, eligible_for_flash_loans) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) 
        RETURNING *`,
       [
         job_id,
@@ -35,7 +35,8 @@ router.post("/create-job", async (req, res) => {
         payment,
         timestamp,
         expiry_time,
-        transaction_hash, // Use the transaction_hash from the request body
+        transaction_hash,
+        eligible_for_flash_loans, // Ensure this value is correctly passed
       ]
     );
 
