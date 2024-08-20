@@ -30,6 +30,6 @@ export const getLoan = async (jobId: string) => {
     // eslint-disable-next-line no-use-before-define
     await walletClient.writeContract(request); // Works with warning
   } catch (error) {
-    console.log(error);
+    console.error(typeof(error));
   }
 };
