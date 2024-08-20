@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useWallet } from '../context/WalletContext';
 import { motion } from 'framer-motion';
 
+import { postJob } from "@/api/daoInteractions";
+
 const JobCreationForm = ({ onJobCreated }) => {
   const { walletAddress } = useWallet(); // Get the wallet address of the logged-in user
   const [title, setTitle] = useState('');
@@ -18,6 +20,11 @@ const JobCreationForm = ({ onJobCreated }) => {
     setLoading(true);
 
     try {
+      // Step 1: Interact with the blockchain to create the job
+      const hash = await postJob(title, description, payment);
+      setTransactionHash(hash); // Save the transaction hash
+
+      // Step 2: Save the job data to the database
       const response = await fetch('http://localhost:3001/api/create-job', {
         method: 'POST',
         headers: {
@@ -31,12 +38,11 @@ const JobCreationForm = ({ onJobCreated }) => {
           employer: walletAddress,
           is_filled: isFilled,
           eligible_for_flash_loans: eligibleForFlashLoans,
-          transaction_hash: transactionHash,
+          transaction_hash: hash, // Use the blockchain transaction hash
         }),
       });
 
       if (response.ok) {
-        const data = await response.json();
         alert('Job created successfully');
         onJobCreated(); // Close the form after job creation
       } else {
@@ -111,8 +117,7 @@ const JobCreationForm = ({ onJobCreated }) => {
         <input
           type="text"
           value={transactionHash}
-          onChange={(e) => setTransactionHash(e.target.value)}
-          required
+          readOnly
           className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
