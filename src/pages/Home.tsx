@@ -13,7 +13,6 @@ export default function Home() {
       try {
         const response = await fetch("http://localhost:3001/api/jobs");
         const data = await response.json();
-        console.log('Jobs Data:', data);  // Log the data to see the structure
         if (Array.isArray(data)) {
           setJobs(data);
         } else {
@@ -44,7 +43,9 @@ export default function Home() {
             />
           </div>
 
-          <h1 className="text-md font-semibold text-gray-600 my-3">Tasks for you</h1>
+          <h1 className="text-md font-semibold text-gray-600 my-3">
+            Tasks for you
+          </h1>
 
           <Tabs defaultValue="best_matches">
             <TabsList>
@@ -75,7 +76,9 @@ export default function Home() {
                 <div>No jobs found.</div>
               )}
             </TabsContent>
-            <TabsContent value="most_recent">Most Recent will be listed here.</TabsContent>
+            <TabsContent value="most_recent">
+              Most Recent will be listed here.
+            </TabsContent>
             <TabsContent value="saved_tasks">Saved tasks.</TabsContent>
           </Tabs>
         </div>
@@ -88,7 +91,10 @@ export default function Home() {
                 <Skeleton className="h-4 w-[80%]" />
               </div>
             </div>
-            <p>Connect your wallet to see your task bid power and start delegating.</p>
+            <p>
+              Connect your wallet to see your task bid power and start
+              delegating.
+            </p>
             <button className="w-full bg-[#7ED956] font-medium text-white py-2 mt-3">
               Connect Wallet
             </button>
