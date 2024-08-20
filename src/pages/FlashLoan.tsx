@@ -1,22 +1,37 @@
-import React from "react";
-
+import React, { useEffect, useState } from "react";
 import Gauge, { GaugeProps } from "@/components/Gauge";
-// import { Button } from "@/components/ui/button"
-// import {
-//   Dialog,
-//   DialogClose,
-//   DialogContent,
-//   DialogDescription,
-//   DialogFooter,
-//   DialogHeader,
-//   DialogTitle,
-//   DialogTrigger,
-// } from "@/components/ui/dialog"
-// import { Input } from "@/components/ui/input"
-// import { Label } from "@/components/ui/label"
-import { getJobData, getLoan } from "@/api/JobTreasury";
+import { ethers } from "ethers";
+import { getLoan } from "@/api/JobTreasury";
 
 type FuelLevelGaugeProps = Pick<GaugeProps, "value">;
+
+interface Job {
+  _id: string;
+  title: string;
+  flashLoanAmount: number;
+  totalAmount: number;
+  isLoanTaken: boolean;
+  employee: string;
+  assignedTo: string;
+}
+
+interface JobProps {
+  job: Job;
+}
+
+const JobTableCell: React.FC<JobProps> = ({ job }) => {
+  return (
+    <td className="px-6 py-4">
+      {job.employee.slice(0, 5)}
+      {job.employee.length > 5 && '...'}
+      {job.employee.length > 5 && job.employee.slice(-5)}
+      {" ➡️ "}
+      {job.assignedTo.slice(0, 5)}
+      {job.assignedTo.length > 5 && '...'}
+      {job.assignedTo.length > 5 && job.assignedTo.slice(-5)}
+    </td>
+  );
+};
 
 const FuelLevelGauge: React.FC<FuelLevelGaugeProps> = ({ value }) => {
   const options: Omit<GaugeProps, "value"> = {
@@ -43,10 +58,27 @@ const FuelLevelGauge: React.FC<FuelLevelGaugeProps> = ({ value }) => {
 };
 
 export default function FlashLoan() {
-  const handleRequestLoan = async () => {
-    const data = await getJobData("project");
-    console.log(data)
-  }
+  const [flashEnabledJobs, setFlashEnabledJobs] = useState<Job[]>([]);
+
+  useEffect(() => {
+    const fetchFlashEnabledJobs = async () => {
+      try {
+        const response = await fetch("http://localhost:3001/api/flash-loan-data");
+        const data = await response.json();
+        setFlashEnabledJobs(data);
+      } catch (error) {
+        console.error("Error fetching flash loan enabled jobs:", error);
+      }
+    };
+
+    fetchFlashEnabledJobs();
+  }, []);
+
+  const handleRequestLoan = async (jobId: string) => {
+    await getLoan(jobId)
+    console.log(`Requesting loan for job ${jobId}`);
+  };
+
   return (
     <div className="container max-w-7xl mx-auto flex mt-8">
       <div className="text-sm flex flex-col items-center min-w-[22vw]">
@@ -88,113 +120,49 @@ export default function FlashLoan() {
                 Employee
               </th>
               <th scope="col" className="px-6 py-3">
+                Status
+              </th>
+              <th scope="col" className="px-6 py-3">
                 Action
               </th>
             </tr>
           </thead>
           <tbody>
-            <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-              <th
-                scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-              >
-                2534 # Build a Flash Loan
-              </th>
-              <td className="px-6 py-4">5,748 USD</td>
-              <td className="px-6 py-4">0x6a68...8dff</td>
-              <td className="px-6 py-4">
-                <button className="bg-gray-200 px-1" onClick={() => handleRequestLoan()}>💵 Request</button>
-              </td>
-            </tr>
-            <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-              <th
-                scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-              >
-                854 # Job Portal on MERN Stack
-              </th>
-              <td className="px-6 py-4">12 USD</td>
-              <td className="px-6 py-4">0x6a68...8dff</td>
-              <td className="px-6 py-4">
-                <button className="bg-gray-200 px-1">💵 Request</button>
-              </td>
-            </tr>
-            <tr className="bg-white dark:bg-gray-800">
-              <th
-                scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-              >
-                9887 # ZeroNet Configuration on Ubuntu
-              </th>
-              <td className="px-6 py-4">1,234.09 USD</td>
-              <td className="px-6 py-4">0x6a68...8dff</td>
-              <td className="px-6 py-4">
-                <button className="bg-gray-200 px-1">💵 Request</button>
-              </td>
-            </tr>
+            {flashEnabledJobs.map((job: Job, index: number) => {
+              return (
+                <tr
+                  key={index}
+                  className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+                >
+                  <th
+                    scope="row"
+                    className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                  >
+                    {job.title}
+                  </th>
+                  <td className="px-6 py-4">
+                    {ethers.formatUnits(BigInt(Math.floor(job.flashLoanAmount)), 18)}/
+                    {ethers.formatUnits(BigInt(Math.floor(job.totalAmount)), 18)} ETH
+                  </td>
+                  <JobTableCell job={job} />
+                  <td className="px-6 py-4">
+                    <div className={job.isLoanTaken ? "bg-[red] text-[white] text-center" : "bg-[green] text-[white] text-center"}>
+                      {job.isLoanTaken ? "Unavailable" : "Available"}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <button
+                      className="bg-gray-200 px-1"
+                      onClick={() => handleRequestLoan(job._id)}
+                    >
+                      💵 Request
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
-        <nav aria-label="Page navigation example">
-          <ul className="inline-flex -space-x-px mt-4 text-sm">
-            <li>
-              <a
-                href="#"
-                className="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-              >
-                Previous
-              </a>
-            </li>
-            <li>
-              <a
-                href="#"
-                className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-              >
-                1
-              </a>
-            </li>
-            <li>
-              <a
-                href="#"
-                className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-              >
-                2
-              </a>
-            </li>
-            <li>
-              <a
-                href="#"
-                aria-current="page"
-                className="flex items-center justify-center px-3 h-8 text-blue-600 border border-gray-300 bg-blue-50 hover:bg-blue-100 hover:text-blue-700 dark:border-gray-700 dark:bg-gray-700 dark:text-white"
-              >
-                3
-              </a>
-            </li>
-            <li>
-              <a
-                href="#"
-                className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-              >
-                4
-              </a>
-            </li>
-            <li>
-              <a
-                href="#"
-                className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-              >
-                5
-              </a>
-            </li>
-            <li>
-              <a
-                href="#"
-                className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-              >
-                Next
-              </a>
-            </li>
-          </ul>
-        </nav>
       </div>
     </div>
   );
