@@ -1,22 +1,39 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import Gauge, { GaugeProps } from "@/components/Gauge";
-// import { Button } from "@/components/ui/button"
-// import {
-//   Dialog,
-//   DialogClose,
-//   DialogContent,
-//   DialogDescription,
-//   DialogFooter,
-//   DialogHeader,
-//   DialogTitle,
-//   DialogTrigger,
-// } from "@/components/ui/dialog"
-// import { Input } from "@/components/ui/input"
-// import { Label } from "@/components/ui/label"
-import { getJobData, getLoan } from "@/api/JobTreasury";
+import { getLoan } from "@/api/JobTreasury";
+// import { getJobData, getLoan } from "@/api/JobTreasury";
+import MockFlashEnabledJobs from "@/mocks/FlashEnabledJobs.json";
+import { ethers } from "ethers";
 
 type FuelLevelGaugeProps = Pick<GaugeProps, "value">;
+
+interface Job {
+  _id: string;
+  title: string;
+  flashLoanAmount: number;
+  totalAmount: number;
+  isLoanTaken: boolean;
+  employee: string; // Single employee address
+  assignedTo: string;
+}
+
+interface JobProps {
+  job: Job; // Single job object
+}
+const JobTableCell: React.FC<JobProps> = ({ job }) => {
+  return (
+    <td className="px-6 py-4">
+      {job.employee.slice(0, 5)}
+      {job.employee.length > 5 && '...'}
+      {job.employee.length > 5 && job.employee.slice(-5)}
+      {" ➡️ "}
+      {job.assignedTo.slice(0, 5)}
+      {job.assignedTo.length > 5 && '...'}
+      {job.assignedTo.length > 5 && job.assignedTo.slice(-5)}
+    </td>
+  );
+};
 
 const FuelLevelGauge: React.FC<FuelLevelGaugeProps> = ({ value }) => {
   const options: Omit<GaugeProps, "value"> = {
@@ -43,10 +60,18 @@ const FuelLevelGauge: React.FC<FuelLevelGaugeProps> = ({ value }) => {
 };
 
 export default function FlashLoan() {
-  const handleRequestLoan = async () => {
-    const data = await getJobData("project");
-    console.log(data)
-  }
+  const [flashEnabledJobs, setFlashEnabledJobs] = useState<any>([]);
+
+  useEffect(() => {
+    setFlashEnabledJobs(MockFlashEnabledJobs);
+  }, []);
+
+  const handleRequestLoan = async (e: string) => {
+    // const data = await getJobData("project");
+    // console.log(data);
+    await getLoan(e);
+  };
+
   return (
     <div className="container max-w-7xl mx-auto flex mt-8">
       <div className="text-sm flex flex-col items-center min-w-[22vw]">
@@ -88,50 +113,48 @@ export default function FlashLoan() {
                 Employee
               </th>
               <th scope="col" className="px-6 py-3">
+                Status
+              </th>
+              <th scope="col" className="px-6 py-3">
                 Action
               </th>
             </tr>
           </thead>
           <tbody>
-            <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-              <th
-                scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-              >
-                2534 # Build a Flash Loan
-              </th>
-              <td className="px-6 py-4">5,748 USD</td>
-              <td className="px-6 py-4">0x6a68...8dff</td>
-              <td className="px-6 py-4">
-                <button className="bg-gray-200 px-1" onClick={() => handleRequestLoan()}>💵 Request</button>
-              </td>
-            </tr>
-            <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-              <th
-                scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-              >
-                854 # Job Portal on MERN Stack
-              </th>
-              <td className="px-6 py-4">12 USD</td>
-              <td className="px-6 py-4">0x6a68...8dff</td>
-              <td className="px-6 py-4">
-                <button className="bg-gray-200 px-1">💵 Request</button>
-              </td>
-            </tr>
-            <tr className="bg-white dark:bg-gray-800">
-              <th
-                scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-              >
-                9887 # ZeroNet Configuration on Ubuntu
-              </th>
-              <td className="px-6 py-4">1,234.09 USD</td>
-              <td className="px-6 py-4">0x6a68...8dff</td>
-              <td className="px-6 py-4">
-                <button className="bg-gray-200 px-1">💵 Request</button>
-              </td>
-            </tr>
+            {flashEnabledJobs.map((job: object, index: any) => {
+              return (
+                <tr
+                  key={index}
+                  className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+                >
+                  <th
+                    scope="row"
+                    className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                  >
+                    {job?.title}
+                  </th>
+                  <td className="px-6 py-4">
+                    {ethers.formatUnits(BigInt(job?.flashLoanAmount), 18)}/
+                    {ethers.formatUnits(BigInt(job.totalAmount), 18)} ETH
+                  </td>
+                  <JobTableCell job={job}/>
+
+                  <td className="px-6 py-4">
+                    <div className={job?.isLoanTaken ? "bg-[red] text-[white]": "bg-[green] text-[white] text-center"}>
+                    {job?.isLoanTaken ? "Unavailable" : "Available"}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <button
+                      className="bg-gray-200 px-1"
+                      onClick={() => handleRequestLoan(job?._id)}
+                    >
+                      💵 Request
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
         <nav aria-label="Page navigation example">

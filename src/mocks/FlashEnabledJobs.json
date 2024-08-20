@@ -1,0 +1,38 @@
+[
+    {
+        "_id": "project1",
+        "title": "Develop New CRM System",
+        "flashLoanAmount": 100000000000000000,
+        "totalAmount": 600000000000000000,
+        "isLoanTaken": false,
+        "employee": "0x6a68D992ad04352cfF67acb4bd9808cdB8d88DfA",
+        "assignedTo": "0xd326B0Ff02BCa2fd4068865033bb48957DF5acA1"
+    },
+    {
+        "_id": "project2",
+        "title": "Redesign Company Website",
+        "flashLoanAmount": 340000000000000000,
+        "totalAmount": 6000000000000000000,
+        "isLoanTaken": true,
+        "employee": "0x6a68D992ad04352cfF67acb4bd9808cdB8d88DfB",
+        "assignedTo": "0xd326B0Ff02BCa2fd4068865033bb48957DF5acB2"
+    },
+    {
+        "_id": "project3",
+        "title": "Launch Marketing Campaign",
+        "flashLoanAmount": 900000000000000000,
+        "totalAmount": 5000000000000000000,
+        "isLoanTaken": false,
+        "employee": "0x6a68D992ad04352cfF67acb4bd9808cdB8d88DfC",
+        "assignedTo": "0xd326B0Ff02BCa2fd4068865033bb48957DF5acC3"
+    },
+    {
+        "_id": "project4",
+        "title": "Upgrade IT Infrastructure",
+        "flashLoanAmount": 123000000000000000,
+        "totalAmount": 8700000000000000000,
+        "isLoanTaken": false,
+        "employee": "0x6a68D992ad04352cfF67acb4bd9808cdB8d88DfD",
+        "assignedTo": "0xd326B0Ff02BCa2fd4068865033bb48957DF5acD4"
+    }
+]
