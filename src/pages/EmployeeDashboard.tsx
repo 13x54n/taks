@@ -141,7 +141,7 @@ const EmployeeDashboard = () => {
               )}
               {job.is_hired && (
                 <button
-                  className={`ml-8 ${disputesRaised.has(job.job_id) ? 'bg-gray-500 cursor-not-allowed' : 'bg-red-500 hover:bg-red-700'} text-white font-bold py-2 px-4 rounded-lg mt-4`}
+                  className={` ${disputesRaised.has(job.job_id) ? 'bg-gray-500 cursor-not-allowed' : 'bg-red-500 hover:bg-red-700'} text-white font-bold py-2 px-4 rounded-lg mt-4`}
                   onClick={() => handleRaiseDispute(job)}
                   disabled={disputesRaised.has(job.job_id)}
                 >
