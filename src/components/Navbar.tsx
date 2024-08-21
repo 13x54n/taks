@@ -1,9 +1,7 @@
 import { useState, useEffect } from "react";
-import { BrowserProvider } from "ethers";
 import { NavLink } from "react-router-dom";
 import { UserCircleIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 import Logo from "../../public/logo.png";
-import { useWallet } from "../context/WalletContext";
 import { useRole } from "../context/RoleContext";
 import RoleSelectionModal from "./ui/RoleSelectionModel";
 
@@ -18,42 +16,41 @@ declare global {
 }
 
 export default function Navbar() {
-  const { walletAddress, setWalletAddress } = useWallet();
+  const [walletAddress, setWalletAddress] = useState<string>("");
   const { role, setRole, fetchUserRole } = useRole();
   const [isRoleModalOpen, setRoleModalOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [tooltip, setTooltip] = useState<string | null>(null);
 
   useEffect(() => {
-    if (walletAddress) {
-      fetchUserRole(walletAddress);
-
-      const storedRole = localStorage.getItem("userRole");
-      if (storedRole) {
-        setRole(storedRole);
+    const isWalletConnected: any = localStorage.getItem("walletAddress") || "";
+    setWalletAddress(isWalletConnected);
+    
+      if (isWalletConnected.length > 0) {
+        fetchUserRole(isWalletConnected);
+  
+        const storedRole = localStorage.getItem("userRole");
+        if (storedRole) {
+          setRole(storedRole);
+        }
       }
-    }
-  }, [walletAddress, fetchUserRole, setRole]);
+  }, []);
 
   const connectWallet = async (): Promise<void> => {
-    try {
-      if (window.ethereum) {
-        const provider = new BrowserProvider(window.ethereum);
-        const accounts = await provider.send("eth_requestAccounts", []);
-        if (Array.isArray(accounts) && typeof accounts[0] === 'string') {
-          setWalletAddress(accounts[0]);
-          if (!localStorage.getItem("userRole")) {
-            setRoleModalOpen(true);
-          }
-        } else {
-          throw new Error("Unexpected response format");
+    const address: any = window.ethereum &&
+      await window.ethereum.request({
+        method: "eth_requestAccounts",
+      });
+
+      localStorage.setItem("walletAddress", address[0])
+      setWalletAddress(address[0])
+
+      fetchUserRole(walletAddress);
+  
+        const storedRole = localStorage.getItem("userRole");
+        if (storedRole) {
+          setRole(storedRole);
         }
-      } else {
-        console.error("MetaMask is not installed");
-      }
-    } catch (error) {
-      console.error("Failed to connect wallet:", error);
-    }
   };
 
   const handleRoleSelect = (selectedRole: string) => {
@@ -147,7 +144,7 @@ export default function Navbar() {
             </div>
           ) : (
             <button
-              onClick={connectWallet}
+              onClick={() => connectWallet()}
               className="text-sm font-semibold leading-6 text-gray-900 border-b-2 border-b-[#7DD956]"
             >
               Connect Wallet

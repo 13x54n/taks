@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useWallet } from '@/context/WalletContext';
 import { applyForJob } from '@/api/daoInteractions';
 
 interface JobApplicationFormProps {
@@ -11,7 +10,7 @@ const JobApplicationForm: React.FC<JobApplicationFormProps> = ({ jobId, onApplic
   const [coverLetter, setCoverLetter] = useState('');
   const [resumeId, setResumeId] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { walletAddress } = useWallet();
+  const walletAddress = "456ghf"
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
