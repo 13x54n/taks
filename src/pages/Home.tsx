@@ -2,17 +2,20 @@ import { useState, useEffect } from "react";
 import TaksCard from "@/components/TaksCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useRole } from "@/context/RoleContext";
 
 export default function Home() {
-  const [jobs, setJobs] = useState([]);
+  const [jobs, setJobs] = useState<any>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<any>(null);
+  const { role, setRole, fetchUserRole } = useRole();
+  const [walletAddress, setWalletAddress] = useState<string>("");
 
   useEffect(() => {
     const fetchJobs = async () => {
       try {
         const response = await fetch("http://localhost:3001/api/jobs");
-        const data = await response.json();
+        const data: any = await response.json();
         if (Array.isArray(data)) {
           setJobs(data);
         } else {
@@ -29,7 +32,22 @@ export default function Home() {
     fetchJobs();
   }, []);
 
+  const connectWallet = async (): Promise<void> => {
+    const address: any = window.ethereum &&
+      await window.ethereum.request({
+        method: "eth_requestAccounts",
+      });
 
+      localStorage.setItem("walletAddress", address[0])
+      setWalletAddress(address[0])
+
+      fetchUserRole(address[0]);
+  
+        const storedRole = localStorage.getItem("userRole");
+        if (storedRole) {
+          setRole(storedRole);
+        }
+  };
 
   return (
     <div className="mx-auto flex max-w-7xl items-center justify-between p-4 lg:px-8">
@@ -61,7 +79,7 @@ export default function Home() {
               ) : error ? (
                 <div>{error}</div>
               ) : jobs.length > 0 ? (
-                jobs.map((job) => (
+                jobs.map((job:any) => (
                   <TaksCard
                     key={job.job_id}
                     jobId={job.job_id} // Use the correct field from your job data
@@ -85,8 +103,8 @@ export default function Home() {
           </Tabs>
         </div>
         <div className="max-w-[20vw] focus:ring-0 focus:border-none">
-          <div className="text-sm p-4">
-            <div className="flex items-center space-x-4 mb-4">
+          
+          <div className="flex items-center space-x-4 mb-4">
               <Skeleton className="h-12 w-12 rounded-full" />
               <div className="space-y-2 flex-1">
                 <Skeleton className="h-4 w-[100%]" />
@@ -97,10 +115,10 @@ export default function Home() {
               Connect your wallet to see your task bid power and start
               delegating.
             </p>
-            <button className="w-full bg-[#7ED956] font-medium text-white py-2 mt-3">
+            <button onClick={() => connectWallet()} className="w-full bg-[#7ED956] font-medium text-white py-2 mt-3">
               Connect Wallet
             </button>
-          </div>
+          
 
           <div className="flex items-start text-sm bg-gray-50 p-4 mt-4 justify-between">
             <div className="">
