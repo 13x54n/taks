@@ -24,12 +24,15 @@ CREATE TABLE Jobs (
 -- Create the Applications table
 CREATE TABLE Applications (
     application_id SERIAL PRIMARY KEY, -- Application ID as an auto-incrementing integer
-    job_id INTEGER REFERENCES Jobs(job_id) ON DELETE CASCADE, -- Job ID as an integer, Foreign Key to Jobs
+    job_id NUMERIC(78, 0) REFERENCES Jobs(job_id) ON DELETE CASCADE, -- Job ID as a NUMERIC(78, 0), Foreign Key to Jobs
     applicant VARCHAR(255) REFERENCES Users(user_id) ON DELETE CASCADE, -- Applicant as Address (Wallet Address), Foreign Key to Users
     resume_id VARCHAR(255) NOT NULL, -- Resume ID as String
     timestamp NUMERIC(78, 0) NOT NULL, -- Timestamp as Uint256
     hired BOOLEAN DEFAULT FALSE -- Boolean to indicate if the applicant has been hired
 );
+ALTER TABLE Applications
+ADD COLUMN cover_letter TEXT;  -- Adding the cover_letter column as a TEXT field
+
 
 -- Create the Roles table
 CREATE TABLE Roles (

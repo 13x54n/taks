@@ -15,6 +15,7 @@ const EmployeeDashboard = () => {
   const [disputeDescription, setDisputeDescription] = useState('');
   const [transactionHash, setTransactionHash] = useState('');
   const [showTooltip, setShowTooltip] = useState(false);
+  const [disputesRaised, setDisputesRaised] = useState(new Set()); // Track raised disputes
 
   // Fetch jobs the employee has applied for
   const fetchAppliedJobs = async () => {
@@ -72,6 +73,10 @@ const EmployeeDashboard = () => {
       const transaction_hash = await raiseDispute(disputeDescription, employerAddress, isAgainstEmployer);
       setTransactionHash(transaction_hash); // Update the transaction hash with the actual value
       alert('Dispute raised successfully');
+      
+      // Close the modal and update the disputesRaised state
+      setShowDisputeModal(false);
+      setDisputesRaised(new Set(disputesRaised).add(selectedJob?.job_id)); // Mark this job as having a raised dispute
 
       // Show tooltip for 3 seconds
       setShowTooltip(true);
@@ -127,10 +132,11 @@ const EmployeeDashboard = () => {
               )}
               {job.is_hired && (
                 <button
-                  className="ml-8 bg-red-500 text-white font-bold py-2 px-4 rounded-lg mt-4 hover:bg-red-700"
+                  className={`ml-8 ${disputesRaised.has(job.job_id) ? 'bg-gray-500 cursor-not-allowed' : 'bg-red-500 hover:bg-red-700'} text-white font-bold py-2 px-4 rounded-lg mt-4`}
                   onClick={() => handleRaiseDispute(job)}
+                  disabled={disputesRaised.has(job.job_id)}
                 >
-                  Raise Dispute
+                  {disputesRaised.has(job.job_id) ? 'Dispute already raised' : 'Raise Dispute'}
                 </button>
               )}
             </motion.div>

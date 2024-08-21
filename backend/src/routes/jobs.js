@@ -92,7 +92,7 @@ router.get("/employer-jobs", async (req, res) => {
         j.employer = $1
       GROUP BY 
         j.job_id
-      ORDER BY 
+      ORDER BY  
         j.timestamp DESC
     `,
       [employerWalletAddress]
