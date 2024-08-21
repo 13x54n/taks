@@ -5,6 +5,7 @@ import EmployeeDashboard from "./EmployeeDashboard";
 import JudiciaryDashboard from "./JudiciaryDashboard"; 
 import { motion } from "framer-motion";
 import { address } from "@/utils/ViemConfig";
+import { addJob } from "@/api/JobTreasury";
 
 interface Application {
   application_id: string;
@@ -77,7 +78,14 @@ const Dashboard = () => {
   };
 
   const handleHire = async (jobId: string, applicant: string) => {
+    // call addJob from API
     try {
+      const job = await fetch(
+        `http://localhost:3001/api/get-job?job_id=${jobId}`
+      );
+      const data = await job.json();
+        await addJob(data[0], applicant);
+
       const response = await fetch(`http://localhost:3001/api/hire-applicant`, {
         method: "POST",
         headers: {
@@ -275,9 +283,12 @@ const Dashboard = () => {
                   </button>
                 )}
                 {application.hired && (
-                  <p className="text-green-600 font-bold mt-4">
+                  <div>
+                    <p className="text-green-600 font-bold mt-4">
                     This applicant has been hired
                   </p>
+                  <button className="bg-gray-700 text-white px-2 rounded-sm mt-3">Release Funds</button>
+                  </div>
                 )}
               </motion.div>
             ))

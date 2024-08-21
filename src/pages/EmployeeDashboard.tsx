@@ -21,7 +21,6 @@ const EmployeeDashboard = () => {
   useEffect(() => {
     (async () => {
       const _address = await address();
-      console.log(_address)
       setWalletAddress(_address)
     })()
   }, [])
