@@ -123,7 +123,7 @@ const EmployeeDashboard = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <h2 className="text-xl font-bold">{job.title}</h2>
+              <h2 className="text-xl font-bold">{job.job_title}</h2>
               <p>{job.description}</p>
               <p>Payment: {job.payment}</p>
               <p>Employer: {job.employer}</p>
