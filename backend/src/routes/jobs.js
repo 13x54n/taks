@@ -127,4 +127,24 @@ router.get("/employer-jobs", async (req, res) => {
   }
 });
 
+router.get("/get-job", async(req, res) => {
+  const {job_id} = req.query;
+
+  if(!job_id){
+    return res.status(400).json({msg: "Job ID required!"})
+  }
+
+  try {
+    const result = await pool.query(
+      `
+      SELECT * FROM jobs as j where j.job_id = ${job_id}
+      `
+    )
+
+    res.json(result.rows)
+  } catch (error) {
+    console.log(error)
+  }
+})
+
 export default router;

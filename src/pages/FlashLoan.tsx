@@ -65,8 +65,6 @@ const customFormatUnits = (amount:any) => {
     BigInt(Math.floor(amount)),
     18
   );
-
-  console.log(formattedAmount)
   
   const amountWith2Decimals = parseFloat(formattedAmount).toFixed(2);
   
@@ -174,12 +172,10 @@ export default function FlashLoan() {
                   <td className="px-6 py-4">
                     <div
                       className={
-                        job.isLoanTaken
-                          ? "bg-[red] text-[white] text-center"
-                          : "bg-[green] text-[white] text-center"
+                          "bg-[green] text-[white] text-center"
                       }
                     >
-                      {job.isLoanTaken ? "Unavailable" : "Available"}
+                      User
                     </div>
                   </td>
                   <td className="px-6 py-4">
