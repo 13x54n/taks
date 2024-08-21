@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { applyForJob } from '@/api/daoInteractions';
+import { address } from '@/utils/ViemConfig';
 
 interface JobApplicationFormProps {
   jobId: string;
@@ -22,7 +23,7 @@ const JobApplicationForm: React.FC<JobApplicationFormProps> = ({ jobId, onApplic
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-
+    
     try {
       await applyForJob(jobId, coverLetter, resumeId);
 
