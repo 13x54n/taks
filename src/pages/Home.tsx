@@ -102,7 +102,7 @@ export default function Home() {
             <TabsContent value="saved_tasks">Saved tasks.</TabsContent>
           </Tabs>
         </div>
-        <div className="max-w-[20vw] focus:ring-0 focus:border-none">
+        {/* <div className="max-w-[20vw] focus:ring-0 focus:border-none">
           
           <div className="flex items-center space-x-4 mb-4">
               <Skeleton className="h-12 w-12 rounded-full" />
@@ -134,7 +134,7 @@ export default function Home() {
               <h1 className="text-xl font-semibold">$2.29B</h1>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );
