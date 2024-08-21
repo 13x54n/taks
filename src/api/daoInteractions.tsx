@@ -50,6 +50,7 @@ export const applyForJob = async (jobId: string, coverLetterIpfsHash: string, re
       account: await walletClient.getAddresses().then(addresses => addresses[0]),
     });
     const hash = await walletClient.writeContract(request);
+    console.log(hash)
     return hash;
   } catch (error) {
     console.log(error);
