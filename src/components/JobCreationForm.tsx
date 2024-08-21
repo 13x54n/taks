@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { postJob } from "@/api/daoInteractions";
-import { publicClient, walletClient, address } from "@/utils/ViemConfig";
+import { publicClient, address } from "@/utils/ViemConfig";
 import { decodeEventLog } from 'viem';
 import Web3JobPortalABI from '@/utils/Web3JobPortalCore.json';
 
