@@ -51,7 +51,29 @@ router.post("/create-job", async (req, res) => {
 router.get("/jobs", async (req, res) => {
   try {
     const result = await pool.query(
-      "SELECT * FROM Jobs ORDER BY timestamp DESC"
+      `SELECT 
+          j.job_id, 
+          j.title, 
+          j.description, 
+          j.employer, 
+          j.payment, 
+          j.is_filled, 
+          j.employee, 
+          j.timestamp, 
+          j.expiry_time, 
+          j.eligible_for_flash_loans, 
+          j.transaction_hash,
+          COUNT(a.application_id) AS application_count
+       FROM 
+          Jobs j
+       LEFT JOIN 
+          Applications a 
+       ON 
+          j.job_id = a.job_id
+       GROUP BY 
+          j.job_id
+       ORDER BY 
+          j.timestamp DESC`
     );
     res.json(result.rows);
   } catch (error) {
