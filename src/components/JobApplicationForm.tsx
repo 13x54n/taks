@@ -14,10 +14,10 @@ const JobApplicationForm: React.FC<JobApplicationFormProps> = ({ jobId, onApplic
   const [walletAddress, setWalletAddress] = useState('');
 
   useEffect(() => {
-    async () => {
+    (async () => {
       const _address = await address();
       setWalletAddress(_address)
-    }
+    })()
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
