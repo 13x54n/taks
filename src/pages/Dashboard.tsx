@@ -33,6 +33,11 @@ const Dashboard = () => {
       try {
         const _address = await address();
         setWalletAddress(_address)
+
+        if (role === "Employer") {
+          fetchJobs(_address);
+          fetchApplications(_address);
+        }
       } catch (error) {
         console.log(error)
       }
@@ -40,11 +45,11 @@ const Dashboard = () => {
   }, [])
 
   // Fetch jobs for the employer
-  const fetchJobs = async () => {
+  const fetchJobs = async (e:any) => {
     try {
       setLoadingJobs(true);
       const response = await fetch(
-        `http://localhost:3001/api/employer-jobs?employerWalletAddress=${walletAddress}`
+        `http://localhost:3001/api/employer-jobs?employerWalletAddress=${e}`
       );
       const data = await response.json();
       setJobs(data);
@@ -56,11 +61,11 @@ const Dashboard = () => {
   };
 
   // Fetch applications for the employer
-  const fetchApplications = async () => {
+  const fetchApplications = async (e:any) => {
     try {
       setLoadingApplications(true);
       const response = await fetch(
-        `http://localhost:3001/api/employer-applications?employerWalletAddress=${walletAddress}`
+        `http://localhost:3001/api/employer-applications?employerWalletAddress=${e}`
       );
       const data = await response.json();
       setApplications(data);
@@ -112,16 +117,9 @@ const Dashboard = () => {
     }
   }, [setRole]);
 
-  useEffect(() => {
-    if (role === "Employer") {
-      fetchJobs();
-      fetchApplications();
-    }
-  }, [walletAddress, role]);
-
   const handleJobCreated = () => {
     setShowJobForm(false);
-    fetchJobs();
+    fetchJobs(walletAddress);
     // Show toast notification
     setShowToast(true);
     setTimeout(() => setShowToast(false), 3000); // Hide the toast after 3 seconds
@@ -257,7 +255,7 @@ const Dashboard = () => {
                   <p>
                     Resume:{" "}
                     <a
-                      href={application.resume_link}
+                      href={`https://gateway.lighthouse.storage/ipfs/${application.resume_id}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-500"
