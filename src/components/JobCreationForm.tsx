@@ -23,7 +23,7 @@ const JobCreationForm = ({ onJobCreated }: JobCreationFormProps) => {
   useEffect(() => {
     (async () => {
       const _address = await address();
-      console.log(_address)
+
       if (_address && _address.length > 0) {
         setUserAddress(_address);
       }
@@ -32,7 +32,7 @@ const JobCreationForm = ({ onJobCreated }: JobCreationFormProps) => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log('hello')
+
     if (!userAddress) {
       alert('Wallet not connected');
       return;

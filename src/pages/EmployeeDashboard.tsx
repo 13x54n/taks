@@ -21,9 +21,10 @@ const EmployeeDashboard = () => {
   useEffect(() => {
     (async () => {
       const _address = await address();
+      console.log(_address)
       setWalletAddress(_address)
     })()
-  })
+  }, [])
 
   // Fetch jobs the employee has applied for
   const fetchAppliedJobs = async () => {
@@ -127,6 +128,7 @@ const EmployeeDashboard = () => {
               <p>{job.description}</p>
               <p>Payment: {job.payment}</p>
               <p>Employer: {job.employer}</p>
+              <p>Employer: {job.eligible_for_flash_loans && "Enabled"}</p>
               <p className="mt-4 font-semibold">
                 {job.is_hired ? 'You are hired for this job!' : 'Application Pending'}
               </p>

@@ -9,6 +9,7 @@ import {
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { useRole } from "@/context/RoleContext"; 
 import JobApplicationForm from "./JobApplicationForm";
+import { address } from "@/utils/ViemConfig";
 
 const formatDate = (timestamp: string) => {
   return new Date(parseInt(timestamp) * 1000).toLocaleString();
@@ -37,9 +38,20 @@ const TaksCard = ({
 }: TaksCardProps) => {
   const [open, setOpen] = useState(false);
   const [applying, setApplying] = useState(false); // Track if the user is applying
-  const [hasApplied, setHasApplied] = useState(false); // Track if the user has applied
-  const walletAddress = "12346854" 
+  const [hasApplied, setHasApplied] = useState(false); // Track if the user has applied 
   const { role } = useRole(); 
+  const [walletAddress, setWalletAddress] = useState<any>();
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const _address = await address();
+        setWalletAddress(_address)
+      } catch (error) {
+        console.log(error)
+      }
+    })()
+  }, [])
 
   useEffect(() => {
     if (role === "Employee") {
@@ -55,7 +67,6 @@ const TaksCard = ({
           );
           const data = await response.json();
   
-          console.log('Application Status Data:', data);
           setHasApplied(data.hasApplied);
         } catch (error) {
           console.error("Error checking application status:", error);
