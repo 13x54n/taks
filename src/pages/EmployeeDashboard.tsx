@@ -21,9 +21,10 @@ const EmployeeDashboard = () => {
   useEffect(() => {
     (async () => {
       const _address = await address();
+      console.log(_address)
       setWalletAddress(_address)
     })()
-  })
+  }, [])
 
   // Fetch jobs the employee has applied for
   const fetchAppliedJobs = async () => {
