@@ -6,7 +6,7 @@ const router = Router();
 // Get all applications for a specific employer
 router.get("/employer-applications", async (req, res) => {
   const { employerWalletAddress } = req.query;
-  cosole.log(`Employer Wallet Address: ${req.query}`);
+  
   try {
     const result = await pool.query(
       `SELECT Applications.*, Jobs.title AS job_title 
