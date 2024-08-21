@@ -8,8 +8,8 @@ export default function Home() {
   const [jobs, setJobs] = useState<any>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<any>(null);
-  const [walletAddress, setWalletAddress] = useState<string>("");
   const { role, setRole, fetchUserRole } = useRole();
+  const [walletAddress, setWalletAddress] = useState<string>("");
 
   useEffect(() => {
     const fetchJobs = async () => {
@@ -79,7 +79,7 @@ export default function Home() {
               ) : error ? (
                 <div>{error}</div>
               ) : jobs.length > 0 ? (
-                jobs.map((job) => (
+                jobs.map((job:any) => (
                   <TaksCard
                     key={job.job_id}
                     jobId={job.job_id} // Use the correct field from your job data
