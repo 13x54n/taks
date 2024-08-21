@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import { useWallet } from "../context/WalletContext";
 import { useRole } from "@/context/RoleContext";
 import JobCreationForm from "@/components/JobCreationForm";
 import EmployeeDashboard from "./EmployeeDashboard";
 import JudiciaryDashboard from "./JudiciaryDashboard"; 
 import { motion } from "framer-motion";
+import { address } from "@/utils/ViemConfig";
 
 interface Application {
   application_id: string;
@@ -18,7 +18,7 @@ interface Application {
 }
 
 const Dashboard = () => {
-  const { walletAddress } = useWallet();
+  const [walletAddress, setWalletAddress] = useState<string>("");
   const { role, setRole } = useRole();
   const [activeTab, setActiveTab] = useState("Jobs");
   const [showJobForm, setShowJobForm] = useState(false);
@@ -27,6 +27,17 @@ const Dashboard = () => {
   const [loadingJobs, setLoadingJobs] = useState(true);
   const [loadingApplications, setLoadingApplications] = useState(true);
   const [showToast, setShowToast] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const _address = await address();
+        setWalletAddress(_address)
+      } catch (error) {
+        console.log(error)
+      }
+    })()
+  }, [])
 
   // Fetch jobs for the employer
   const fetchJobs = async () => {
@@ -198,7 +209,7 @@ const Dashboard = () => {
           {loadingJobs ? (
             <div>Loading...</div>
           ) : jobs.length > 0 ? (
-            jobs.map((job) => (
+            jobs.map((job: any) => (
               <motion.div
                 key={job.job_id}
                 className="bg-white p-6 rounded-lg shadow-md mb-4"
@@ -228,7 +239,7 @@ const Dashboard = () => {
           {loadingApplications ? (
             <div>Loading...</div>
           ) : applications.length > 0 ? (
-            applications.map((application) => (
+            applications.map((application: any) => (
               <motion.div
                 key={application.application_id}
                 className="bg-white p-6 rounded-lg shadow-md mb-4"

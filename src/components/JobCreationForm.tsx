@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { postJob } from "@/api/daoInteractions";
-import { publicClient, walletClient, address } from "@/utils/ViemConfig";
-import { parseAbiItem, decodeEventLog } from 'viem';
+import { publicClient, address } from "@/utils/ViemConfig";
+import { decodeEventLog } from 'viem';
 import Web3JobPortalABI from '@/utils/Web3JobPortalCore.json';
 
 interface JobCreationFormProps {
@@ -21,16 +21,18 @@ const JobCreationForm = ({ onJobCreated }: JobCreationFormProps) => {
   const [userAddress, setUserAddress] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchAddress = async () => {
-      if (address && address.length > 0) {
-        setUserAddress(address[0]);
+    (async () => {
+      const _address = await address();
+      console.log(_address)
+      if (_address && _address.length > 0) {
+        setUserAddress(_address);
       }
-    };
-    fetchAddress();
+    })()
   }, []);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.log('hello')
     if (!userAddress) {
       alert('Wallet not connected');
       return;
@@ -46,41 +48,28 @@ const JobCreationForm = ({ onJobCreated }: JobCreationFormProps) => {
       const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash });
 
       // Define the ABI for the JobPosted event
-    //  
-    
-    const abiArray = Web3JobPortalABI.abi;  // Now we're correctly accessing the ABI array
+      const abiArray = Web3JobPortalABI.abi;
 
-    // Find the specific event ABI in the ABI array
-    const jobPostedEventAbi = abiArray.find(
-      (item) => item.type === 'event' && item.name === 'JobPosted'
-    );
-    
-    if (!jobPostedEventAbi) {
-      throw new Error('JobPosted event ABI not found');
-    }
-    
-    // Example log from the transaction receipt
-    const log = receipt.logs[0];  // Ensure this references the correct log index
-    
-    // Decode the event log using the ABI from the JSON file
-    const decodedJobPostedEvent = decodeEventLog({
-      abi: [jobPostedEventAbi],
-      data: log.data,
-      topics: log.topics,
-    });
-    
-    console.log('Decoded JobPosted Event:', decodedJobPostedEvent);
+      // Find the specific event ABI in the ABI array
+      const jobPostedEventAbi = abiArray.find(
+        (item) => item.type === 'event' && item.name === 'JobPosted'
+      );
 
-      
-      
+      if (!jobPostedEventAbi) {
+        throw new Error('JobPosted event ABI not found');
+      }
 
-    const jobId = decodedJobPostedEvent.args.jobId.toString();  // Convert BigInt to string
+      // Example log from the transaction receipt
+      const log = receipt.logs[0]; // Ensure this references the correct log index
 
+      // Decode the event log using the ABI from the JSON file
+      const decodedJobPostedEvent: any = decodeEventLog({
+        abi: [jobPostedEventAbi],
+        data: log.data,
+        topics: log.topics,
+      });
 
-    // const employer = decodedJobPostedEvent.args.employer;
-    // const jobTitle = decodedJobPostedEvent.args.jobTitle;
-    // const jobDescription = decodedJobPostedEvent.args.jobDescription;
-    // const salary = decodedJobPostedEvent.args.salary.toString();
+      const jobId = decodedJobPostedEvent?.args.jobId.toString();
 
       // Step 3: Save the job data to the database
       const response = await fetch('http://localhost:3001/api/create-job', {
@@ -164,14 +153,15 @@ const JobCreationForm = ({ onJobCreated }: JobCreationFormProps) => {
         />
       </div>
       <div className="flex items-center space-x-4">
-        <label className="block text-sm font-bold mb-2">Eligible for Flash Loans</label>
-        <input
-          type="checkbox"
-          checked={eligibleForFlashLoans}
-          onChange={(e) => setEligibleForFlashLoans(e.target.checked)}
-          className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-        />
-      </div>
+  <label className="block text-sm font-bold mb-2">Eligible for Flash Loans</label>
+  <input
+    type="checkbox"
+    checked={eligibleForFlashLoans}
+    onChange={(e) => setEligibleForFlashLoans(e.target.checked)}
+    className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+  />
+</div>
+
       <div>
         <label className="block text-sm font-bold mb-2">Transaction Hash</label>
         <input

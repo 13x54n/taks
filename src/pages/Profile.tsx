@@ -7,10 +7,11 @@ import {
   ScaleIcon,
   FireIcon,
 } from "@heroicons/react/24/solid";
-import { useWallet } from "../context/WalletContext";
 
 const Profile = () => {
-  const { walletAddress, role } = useWallet();
+  // const { walletAddress, role } = useWallet();
+  const walletAddress = "2456"
+  const role="employee"
   console.log(`Role: ${role}`)
   const isVerified = true; // Set to true if the user is verified
   const badges = ["Early Adopter", "Contributor", "Top Voter"];

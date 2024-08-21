@@ -20,17 +20,20 @@ interface JobProps {
 }
 
 const JobTableCell: React.FC<JobProps> = ({ job }) => {
-  return (
-    <td className="px-6 py-4">
-      {job.employee.slice(0, 5)}
-      {job.employee.length > 5 && '...'}
-      {job.employee.length > 5 && job.employee.slice(-5)}
-      {" ➡️ "}
-      {job.assignedTo.slice(0, 5)}
-      {job.assignedTo.length > 5 && '...'}
-      {job.assignedTo.length > 5 && job.assignedTo.slice(-5)}
-    </td>
-  );
+  if (job)
+    return (
+      <td className="px-6 py-4">
+        {job?.employee.slice(0, 5)}
+        {job?.employee.length > 5 && "..."}
+        {job?.employee.length > 5 && job?.employee.slice(-5)}
+        {" ➡️ "}
+        {job?.assignedTo && job?.assignedTo.slice(0, 5)}
+        {job?.assignedTo && job?.assignedTo.length > 5 && "..."}
+        {job?.assignedTo &&
+          job?.assignedTo.length > 5 &&
+          job?.assignedTo.slice(-5)}
+      </td>
+    );
 };
 
 const FuelLevelGauge: React.FC<FuelLevelGaugeProps> = ({ value }) => {
@@ -57,13 +60,28 @@ const FuelLevelGauge: React.FC<FuelLevelGaugeProps> = ({ value }) => {
   return <Gauge {...options} value={value} />;
 };
 
+const customFormatUnits = (amount:any) => {
+  const formattedAmount = ethers.formatUnits(
+    BigInt(Math.floor(amount)),
+    18
+  );
+
+  console.log(formattedAmount)
+  
+  const amountWith2Decimals = parseFloat(formattedAmount).toFixed(2);
+  
+  return amountWith2Decimals;
+}
+
 export default function FlashLoan() {
   const [flashEnabledJobs, setFlashEnabledJobs] = useState<Job[]>([]);
 
   useEffect(() => {
     const fetchFlashEnabledJobs = async () => {
       try {
-        const response = await fetch("http://localhost:3001/api/flash-loan-data");
+        const response = await fetch(
+          "http://localhost:3001/api/flash-loan-data"
+        );
         const data = await response.json();
         setFlashEnabledJobs(data);
       } catch (error) {
@@ -75,8 +93,12 @@ export default function FlashLoan() {
   }, []);
 
   const handleRequestLoan = async (jobId: string) => {
-    await getLoan(jobId)
-    console.log(`Requesting loan for job ${jobId}`);
+    try {
+      await getLoan(jobId);
+      console.log(`Requesting loan for job ${jobId}`);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -103,11 +125,11 @@ export default function FlashLoan() {
         </div>
       </div>
 
-      <div className="relative overflow-x-auto w-full">
+      <div className="relative flex-1 w-full">
         <p className="mb-3 text-sm text-white pl-4 bg-primary">
           Flash Loans Enabled taks.
         </p>
-        <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+        <table className="w-[100%] text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
           <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
             <tr>
               <th scope="col" className="px-6 py-3">
@@ -141,12 +163,22 @@ export default function FlashLoan() {
                     {job.title}
                   </th>
                   <td className="px-6 py-4">
-                    {ethers.formatUnits(BigInt(Math.floor(job.flashLoanAmount)), 18)}/
-                    {ethers.formatUnits(BigInt(Math.floor(job.totalAmount)), 18)} ETH
+                    {
+                      customFormatUnits(job?.flashLoanAmount)
+                    }
+                    /
+                    {customFormatUnits(job?.totalAmount)}
+                    ETH
                   </td>
                   <JobTableCell job={job} />
                   <td className="px-6 py-4">
-                    <div className={job.isLoanTaken ? "bg-[red] text-[white] text-center" : "bg-[green] text-[white] text-center"}>
+                    <div
+                      className={
+                        job.isLoanTaken
+                          ? "bg-[red] text-[white] text-center"
+                          : "bg-[green] text-[white] text-center"
+                      }
+                    >
                       {job.isLoanTaken ? "Unavailable" : "Available"}
                     </div>
                   </td>

@@ -3,7 +3,7 @@ import DaoABI from "../utils/DaoABI.json"; // Replace with the correct path to y
 import { publicClient, walletClient } from "@/utils/ViemConfig";
 
 // Use the provided DAO contract address
-const DAO_CONTRACT_ADDRESS = "0x7125a29ef86aE9698936B5AF741F8e37FD0dd304";
+const DAO_CONTRACT_ADDRESS = "0x12f2fe6c2e35d2dcf9a5299b22c202ea23fe7f81";
 
 // Function to get job data
 export const getJobData = async (jobId: string) => {
@@ -50,6 +50,7 @@ export const applyForJob = async (jobId: string, coverLetterIpfsHash: string, re
       account: await walletClient.getAddresses().then(addresses => addresses[0]),
     });
     const hash = await walletClient.writeContract(request);
+    console.log(hash)
     return hash;
   } catch (error) {
     console.log(error);
@@ -126,5 +127,20 @@ export const executeDispute = async (disputeId: string, proposalId: string, targ
   } catch (error) {
     console.log(error);
     throw new Error("Failed to execute dispute");
+  }
+};
+
+// Function to get all the disputes
+export const getAllDisputes = async () => {
+  try {
+    const disputes = await publicClient.readContract({
+      address: DAO_CONTRACT_ADDRESS,
+      abi: DaoABI,
+      functionName: 'getAllDisputes',
+    });
+    return disputes;
+  } catch (error) {
+    console.log(error);
+    throw new Error("Failed to fetch disputes");
   }
 };

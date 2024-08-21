@@ -43,7 +43,9 @@ export const RoleProvider: React.FC<RoleProviderProps> = ({ children }) => {
   };
 
   useEffect(() => {
-    if (role) {
+    const isUserLoggedIn = localStorage.getItem("walletAddress");
+    
+    if (role && isUserLoggedIn) {
       localStorage.setItem("userRole", role);
     } else {
       localStorage.removeItem("userRole");

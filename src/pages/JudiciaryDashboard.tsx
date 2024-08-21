@@ -24,11 +24,12 @@ const JudiciaryDashboard = () => {
   return (
     <div className="mt-8 container md:mx-auto">
       <h2 className="text-2xl font-bold mb-4 text-gray-800">Overview</h2>
+  
       <Link
-        to=""
+        to="/verification"
         className="flex text-right items-center gap-2 w-full justify-end text-green-700 hover:underline"
       >
-        <span>Court on Chain</span>
+        <span>Get Verification</span>
         <ArrowRightIcon aria-hidden="true" className="h-4 w-4" />
       </Link>
       <div className="mt-2">

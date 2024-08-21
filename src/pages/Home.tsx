@@ -29,6 +29,8 @@ export default function Home() {
     fetchJobs();
   }, []);
 
+
+
   return (
     <div className="mx-auto flex max-w-7xl items-center justify-between p-4 lg:px-8">
       <div className="flex items-start w-full gap-4">
@@ -66,7 +68,7 @@ export default function Home() {
                     title={job.title}
                     description={job.description}
                     creator={job.employer}
-                    proposals="Less than 5"
+                    proposals={job.application_count}
                     timePosted={job.timestamp}
                     tokenStake={job.payment}
                     transactionHash={job.transaction_hash}

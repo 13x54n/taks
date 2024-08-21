@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { useWallet } from '@/context/WalletContext';
+import React, { useEffect, useState } from 'react';
+import { applyForJob } from '@/api/daoInteractions';
+import { address } from '@/utils/ViemConfig';
 
 interface JobApplicationFormProps {
   jobId: string;
@@ -10,13 +11,22 @@ const JobApplicationForm: React.FC<JobApplicationFormProps> = ({ jobId, onApplic
   const [coverLetter, setCoverLetter] = useState('');
   const [resumeId, setResumeId] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { walletAddress } = useWallet();
+  const [walletAddress, setWalletAddress] = useState('');
+
+  useEffect(() => {
+    (async () => {
+      const _address = await address();
+      setWalletAddress(_address)
+    })()
+  })
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-
+    
     try {
+      await applyForJob(jobId, coverLetter, resumeId);
+
       const response = await fetch('http://localhost:3001/api/apply-job', {
         method: 'POST',
         headers: {
@@ -26,8 +36,8 @@ const JobApplicationForm: React.FC<JobApplicationFormProps> = ({ jobId, onApplic
           jobId,
           applicant: walletAddress,
           resumeId,
-          coverLetter: coverLetter || null, // Include cover letter if provided, otherwise send null
-          timestamp: Math.floor(Date.now() / 1000), // Example timestamp
+          coverLetter: coverLetter || null, 
+          timestamp: Math.floor(Date.now() / 1000), 
         }),
       });
 
