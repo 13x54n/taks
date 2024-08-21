@@ -6,6 +6,7 @@ const router = Router();
 // Get all applications for a specific employer
 router.get("/employer-applications", async (req, res) => {
   const { employerWalletAddress } = req.query;
+  cosole.log(`Employer Wallet Address: ${req.query}`);
   try {
     const result = await pool.query(
       `SELECT Applications.*, Jobs.title AS job_title 
@@ -149,15 +150,39 @@ router.get("/has-applied/:jobId/:applicant", async (req, res) => {
 // Get all applications for a specific employee
 router.get("/employee-applications", async (req, res) => {
   const { employeeWalletAddress } = req.query;
+
   try {
     const result = await pool.query(
-      `SELECT Applications.*, Jobs.title AS job_title, Jobs.description, Jobs.payment, Jobs.employer, Jobs.is_filled AS is_hired, Jobs.eligible_for_flash_loans 
+      `SELECT 
+         Applications.application_id,
+         Applications.job_id, 
+         Applications.applicant, 
+         Applications.resume_id, 
+         Applications.timestamp, 
+         Applications.hired, 
+         Applications.cover_letter,
+         Jobs.title AS job_title, 
+         Jobs.description, 
+         Jobs.payment, 
+         Jobs.employer, 
+         Jobs.is_filled AS is_hired, 
+         Jobs.eligible_for_flash_loans 
        FROM Applications 
-       JOIN Jobs ON Applications.job_id = Jobs.job_id 
+       JOIN Jobs ON Applications.job_id::numeric = Jobs.job_id 
        WHERE Applications.applicant = $1 
        ORDER BY Applications.timestamp DESC`,
       [employeeWalletAddress]
     );
+    console.log("---------------------");
+    console.log(result);
+    console.log("---------------------");
+
+    if (result.rows.length === 0) {
+      return res
+        .status(404)
+        .json({ error: "No applications found for this employee." });
+    }
+
     res.json(result.rows);
   } catch (error) {
     console.error("Error fetching employee applications:", error);

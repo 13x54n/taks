@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useRole } from '../context/RoleContext';
 import { raiseDispute } from '@/api/daoInteractions';
+import { address } from '@/utils/ViemConfig';
 
 const EmployeeDashboard = () => {
-  const walletAddress = "gfvghv "
   const { role } = useRole();
   const [appliedJobs, setAppliedJobs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -14,7 +14,16 @@ const EmployeeDashboard = () => {
   const [disputeDescription, setDisputeDescription] = useState('');
   const [transactionHash, setTransactionHash] = useState('');
   const [showTooltip, setShowTooltip] = useState(false);
+  const [walletAddress, setWalletAddress] = useState('');
   const [disputesRaised, setDisputesRaised] = useState(new Set()); // Track raised disputes
+
+
+  useEffect(() => {
+    (async () => {
+      const _address = await address();
+      setWalletAddress(_address)
+    })()
+  })
 
   // Fetch jobs the employee has applied for
   const fetchAppliedJobs = async () => {
@@ -22,6 +31,7 @@ const EmployeeDashboard = () => {
       setLoading(true);
       const response = await fetch(`http://localhost:3001/api/employee-applications?employeeWalletAddress=${walletAddress}`);
       const data = await response.json();
+      console.log(`Data : ${data}`)
       setAppliedJobs(data);
     } catch (error) {
       console.error('Error fetching applied jobs:', error);
