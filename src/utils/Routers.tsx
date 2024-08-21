@@ -79,10 +79,6 @@ export const router = createBrowserRouter([
     ),
   },
   {
-    path: "/test",
-    element: <>Test</>,
-  },
-  {
     path: "/flash-loan",
     element: (
       <Layout>

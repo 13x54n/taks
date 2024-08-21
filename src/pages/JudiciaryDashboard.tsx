@@ -32,9 +32,6 @@ const JudiciaryDashboard = () => {
         <span>Get Verification</span>
         <ArrowRightIcon aria-hidden="true" className="h-4 w-4" />
       </Link>
-      <div className="mt-2">
-        <RewardCard />
-      </div>
       <div>
       <DashCard
           title="Dispute Cases"

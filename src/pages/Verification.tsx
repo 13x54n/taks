@@ -1,8 +1,9 @@
+import { address } from '@/utils/ViemConfig';
 import React, { useState, useRef, useEffect } from 'react';
 
 
 export default function Verification() {
-  const walletAddress = "65465";
+  const [walletAddress, setWalletAddress] = useState<any>();
   const [isRecording, setIsRecording] = useState(false);
   const [isPreview, setIsPreview] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
@@ -11,6 +12,12 @@ export default function Verification() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const previewRef = useRef<HTMLVideoElement>(null);
 
+  useEffect(() => {
+    (async () => {
+      const _address = await address();
+      setWalletAddress(_address)
+    })()
+  }, [])
   useEffect(() => {
     if (isRecording && videoRef.current) {
       navigator.mediaDevices.getUserMedia({ video: true, audio: true })

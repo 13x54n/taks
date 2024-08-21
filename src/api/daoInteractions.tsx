@@ -144,3 +144,19 @@ export const getAllDisputes = async () => {
     throw new Error("Failed to fetch disputes");
   }
 };
+
+export const castVote = async (proposalId: any, vote: any) => {
+  try {
+    const { request } = await publicClient.simulateContract({
+      address: DAO_CONTRACT_ADDRESS,
+      abi: DaoABI,
+      functionName: 'castVote',
+      args: [proposalId, vote],
+      account: await walletClient.getAddresses().then(addresses => addresses[0]),
+    });
+    const hash = await walletClient.writeContract(request);
+    return hash;
+  } catch (error) {
+    console.log(error)
+  }
+}
