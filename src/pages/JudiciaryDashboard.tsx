@@ -24,7 +24,7 @@ const JudiciaryDashboard = () => {
   return (
     <div className="mt-8 container md:mx-auto">
       <h2 className="text-2xl font-bold mb-4 text-gray-800">Overview</h2>
-  
+
       <Link
         to="/verification"
         className="flex text-right items-center gap-2 w-full justify-end text-green-700 hover:underline"
@@ -79,9 +79,7 @@ const JudiciaryDashboard = () => {
           icon={<BriefcaseIcon aria-hidden="true" className="h-4 w-4" />}
         >
           <div className="flex flex-col space-y-2">
-            {mockCasesData.map((caseData) => (
-              <CaseItem key={caseData.case_id} caseData={caseData} />
-            ))}
+            <CaseItem />
           </div>
         </DashCard>
 

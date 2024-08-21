@@ -1,114 +1,67 @@
-import React, { useState } from "react";
-import { PlusIcon } from "@heroicons/react/24/outline";
-import { MinusIcon } from "@heroicons/react/24/outline";
+import React, { useEffect, useState, useRef, memo } from "react";
 import { getAllDisputes } from "@/api/daoInteractions";
 
-const CaseItem: React.FC<{ caseData: Case }> = ({ caseData }) => {
-  const [isOpen, setIsOpen] = useState(false);
+const CaseItem = memo(() => {
+  const [disputes, setDisputes] = useState([]);
+  const fetchedRef = useRef(false);
 
-  console.log(getAllDisputes());
+  useEffect(() => {
+    const fetchDisputes = async () => {
+      try {
+        const disputesData = await getAllDisputes();
+        console.log("DisputesData:", disputesData);
+        setDisputes(disputesData);
+      } catch (error) {
+        console.error("Failed to fetch disputes(caseItem.tsx):", error);
+      }
+    };
 
-  const handleToggle = () => {
-    setIsOpen(!isOpen);
-  };
+    if (!fetchedRef.current) {
+      fetchDisputes();
+      fetchedRef.current = true;
+    }
+  }, []);
 
-  const handleVoteYes = () => {
-    console.log(`Approved case: ${caseData.case_id}`);
-    // Add your logic for approving the case
-  };
-
-  const handleVoteNo = () => {
-    console.log(`Declined case: ${caseData.case_id}`);
-    // Add your logic for declining the case
-  };
-
-  const isVoteDisabled = !caseData.is_current_user_juror;
+  if (!disputes.length) {
+    return <p className="text-gray-500 text-center">No disputes found</p>;
+  }
 
   return (
-    <div className="bg-white border-b-2 p-4 mb-4">
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-bold">{caseData.title}</h3>
-        <button onClick={handleToggle} className="text-green-500">
-          {/* {isOpen ? "Collapse" : "Expand"} */}
-          {isOpen ? (
-            <MinusIcon className="h-6 w-6" />
-          ) : (
-            <PlusIcon className="h-6 w-6" />
-          )}
-        </button>
-      </div>
-      {isOpen && (
-        <div className="mt-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div>
-              <p>
-                <strong>Status:</strong> {caseData.status}
-              </p>
-              <p>
-                <strong>Outcome:</strong> {caseData.outcome}
-              </p>
-              <p>
-                <strong>Juror Count:</strong> {caseData.juror_count}
-              </p>
-              <p>
-                <strong>Expiry Time:</strong>{" "}
-                {new Date(caseData.expiry_time).toLocaleString()}
-              </p>
-              <p>
-                <strong>Evidence:</strong> {caseData.ipfs_hash.slice(0, 6)}...
-                {caseData.ipfs_hash.slice(-6)}
-              </p>
-            </div>
-            <div>
-              <p>
-                <strong>Votes:</strong>
-              </p>
-              <p>Yes: {caseData.votes?.yes}</p>
-              <p>No: {caseData.votes?.no}</p>
-              <p>Pending: {caseData.votes?.pending}</p>
-              <p>Total: {caseData.votes?.total_votes}</p>
-            </div>
-          </div>
-          {!caseData.is_current_user_juror ? (
-            <p className="text-sm text-gray-500 mt-2">
-              You are not a juror for this case. Voting is disabled.
-            </p>
-          ) : (
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={handleVoteYes}
-                disabled={isVoteDisabled}
-                className={`px-4 py-2 rounded ${
-                  isVoteDisabled
-                    ? "bg-gray-300"
-                    : "bg-green-500 hover:bg-green-600 text-white"
-                }`}
-              >
-                Vote Yes
-              </button>
-              <button
-                onClick={handleVoteNo}
-                disabled={isVoteDisabled}
-                className={`px-4 py-2 rounded ${
-                  isVoteDisabled
-                    ? "bg-gray-300"
-                    : "bg-red-500 hover:bg-red-600 text-white"
-                }`}
-              >
-                Vote No
-              </button>
-            </div>
-          )}
+    <div className="container mx-auto p-4">
+      {disputes.map((dispute, index) => (
+        <div
+          key={index}
+          className="bg-white shadow-md rounded-lg p-6 mb-4 transition duration-500 hover:shadow-lg"
+        >
+          <h3 className="text-xl font-semibold text-gray-800 mb-2">
+            Dispute ID: {dispute.disputeId.toString()}
+          </h3>
+          <p className="text-gray-600">
+            <span className="font-semibold">Description:</span> {dispute.description}
+          </p>
+          <p className="text-gray-600">
+            <span className="font-semibold">Initiator:</span> {dispute.initiator}
+          </p>
+          <p className="text-gray-600">
+            <span className="font-semibold">Target:</span> {dispute.target}
+          </p>
 
-          {/* {!caseData.is_current_user_juror && (
-            <p className="text-sm text-gray-500 mt-2">
-              You are not a juror for this case. Voting is disabled.
-            </p>
-          )} */}
+          <div className="mt-4 flex justify-end space-x-4">
+            <button
+              className="px-4 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition duration-300"
+            >
+              Vote
+            </button>
+            {/* <button
+              className="px-4 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition duration-300"
+            >
+              Raise Issue
+            </button> */}
+          </div>
         </div>
-      )}
+      ))}
     </div>
   );
-};
+});
 
 export default CaseItem;
