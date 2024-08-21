@@ -45,7 +45,7 @@ export default function Navbar() {
       localStorage.setItem("walletAddress", address[0])
       setWalletAddress(address[0])
 
-      fetchUserRole(walletAddress);
+      fetchUserRole(address[0]);
   
         const storedRole = localStorage.getItem("userRole");
         if (storedRole) {
@@ -103,9 +103,11 @@ export default function Navbar() {
           <NavLink to="/awards" className="text-sm font-semibold leading-6 text-gray-900">
             Awards
           </NavLink>
-          <NavLink to="/flash-loan" className="text-sm font-semibold leading-6 text-gray-900">
+          {
+            role === "Employee" && <NavLink to="/flash-loan" className="text-sm font-semibold leading-6 text-gray-900">
             Flash Loan
           </NavLink>
+          }
         </div>
 
         {/* Right - Wallet Connection */}

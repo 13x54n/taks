@@ -21,16 +21,18 @@ const JobCreationForm = ({ onJobCreated }: JobCreationFormProps) => {
   const [userAddress, setUserAddress] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchAddress = async () => {
-      if (address && address.length > 0) {
-        setUserAddress(address[0]);
+    (async () => {
+      const _address = await address();
+      console.log(_address)
+      if (_address && _address.length > 0) {
+        setUserAddress(_address);
       }
-    };
-    fetchAddress();
+    })()
   }, []);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.log('hello')
     if (!userAddress) {
       alert('Wallet not connected');
       return;
@@ -61,13 +63,13 @@ const JobCreationForm = ({ onJobCreated }: JobCreationFormProps) => {
       const log = receipt.logs[0]; // Ensure this references the correct log index
 
       // Decode the event log using the ABI from the JSON file
-      const decodedJobPostedEvent = decodeEventLog({
+      const decodedJobPostedEvent: any = decodeEventLog({
         abi: [jobPostedEventAbi],
         data: log.data,
         topics: log.topics,
       });
 
-      const jobId = decodedJobPostedEvent.args.jobId.toString();
+      const jobId = decodedJobPostedEvent?.args.jobId.toString();
 
       // Step 3: Save the job data to the database
       const response = await fetch('http://localhost:3001/api/create-job', {

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { applyForJob } from '@/api/daoInteractions';
+import { address } from '@/utils/ViemConfig';
 
 interface JobApplicationFormProps {
   jobId: string;
@@ -10,12 +11,12 @@ const JobApplicationForm: React.FC<JobApplicationFormProps> = ({ jobId, onApplic
   const [coverLetter, setCoverLetter] = useState('');
   const [resumeId, setResumeId] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const walletAddress = "456ghf"
+  const walletAddress = address;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-
+    
     try {
       await applyForJob(jobId, coverLetter, resumeId);
 
