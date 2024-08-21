@@ -7,7 +7,6 @@ import {
   TransitionChild,
 } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
-import { useWallet } from "@/context/WalletContext";
 import { useRole } from "@/context/RoleContext"; 
 import JobApplicationForm from "./JobApplicationForm";
 
@@ -39,7 +38,7 @@ const TaksCard = ({
   const [open, setOpen] = useState(false);
   const [applying, setApplying] = useState(false); // Track if the user is applying
   const [hasApplied, setHasApplied] = useState(false); // Track if the user has applied
-  const { walletAddress } = useWallet(); 
+  const walletAddress = "12346854" 
   const { role } = useRole(); 
 
   useEffect(() => {

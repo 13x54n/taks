@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useWallet } from "../context/WalletContext";
 import { useRole } from "@/context/RoleContext";
 import JobCreationForm from "@/components/JobCreationForm";
 import EmployeeDashboard from "./EmployeeDashboard";
@@ -18,7 +17,7 @@ interface Application {
 }
 
 const Dashboard = () => {
-  const { walletAddress } = useWallet();
+  const walletAddress = "ffcvguhjvjh";
   const { role, setRole } = useRole();
   const [activeTab, setActiveTab] = useState("Jobs");
   const [showJobForm, setShowJobForm] = useState(false);

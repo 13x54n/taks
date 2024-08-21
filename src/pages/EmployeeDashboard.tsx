@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useWallet } from '../context/WalletContext';
 import { useRole } from '../context/RoleContext';
 
 const EmployeeDashboard = () => {
-  const { walletAddress } = useWallet();
+  const walletAddress = "gfvghv "
   const { role } = useRole();
   const [appliedJobs, setAppliedJobs] = useState([]);
   const [loading, setLoading] = useState(true);

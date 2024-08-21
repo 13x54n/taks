@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useWallet } from '@/context/WalletContext';
+
 
 export default function Verification() {
-  const { walletAddress } = useWallet(); // Get wallet address from context
+  const walletAddress = "65465";
   const [isRecording, setIsRecording] = useState(false);
   const [isPreview, setIsPreview] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
