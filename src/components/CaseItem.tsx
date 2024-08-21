@@ -52,11 +52,11 @@ const CaseItem = memo(() => {
             >
               Vote
             </button>
-            {/* <button
-              className="px-4 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition duration-300"
+            <button
+              className="px-4 py-2 bg-green-500 text-white rounded-lg shadow hover:bg-red-600 transition duration-300"
             >
-              Raise Issue
-            </button> */}
+              Report
+            </button>
           </div>
         </div>
       ))}

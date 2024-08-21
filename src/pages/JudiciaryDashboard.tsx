@@ -36,6 +36,14 @@ const JudiciaryDashboard = () => {
         <RewardCard />
       </div>
       <div>
+      <DashCard
+          title="Dispute Cases"
+          icon={<BriefcaseIcon aria-hidden="true" className="h-4 w-4" />}
+        >
+          <div className="flex flex-col space-y-2">
+            <CaseItem />
+          </div>
+        </DashCard>
         <DashCard
           title="Cases"
           icon={<BriefcaseIcon aria-hidden="true" className="h-4 w-4" />}
@@ -74,14 +82,7 @@ const JudiciaryDashboard = () => {
           </DashCard>
         </div>
 
-        <DashCard
-          title="Dispute Cases"
-          icon={<BriefcaseIcon aria-hidden="true" className="h-4 w-4" />}
-        >
-          <div className="flex flex-col space-y-2">
-            <CaseItem />
-          </div>
-        </DashCard>
+
 
         <DashCard
           title="Notifications"
